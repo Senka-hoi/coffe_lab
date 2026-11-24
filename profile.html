@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+{% set user = user|default(None) %}
+{% set record = record|default(user) %}
+<section class="section">
+  <div class="section-head reveal">
+    <p class="eyebrow">личный кабинет</p>
+    <h1>Профиль</h1>
+  </div>
+
+  <div class="profile-grid">
+    <div class="profile-card reveal">
+      <div class="avatar-ring">
+        <img id="avatarImg" src="{{ record.avatar|default('/static/avatars/default.svg') }}" alt="Аватар {{ record.login }}">
+      </div>
+      <h2>{{ record.login }}</h2>
+      <span class="badge {{ record.role }}">{{ 'Администратор' if record.role == 'admin' else 'Читатель' }}</span>
+      <ul class="facts">
+        <li><span>Логин</span><b>{{ record.login }}</b></li>
+        <li><span>Роль</span><b>{{ record.role }}</b></li>
+        <li><span>Аватар</span><b class="mono">{{ record.avatar|default('—') }}</b></li>
+      </ul>
+    </div>
+
+    <div class="profile-side">
+      <div class="form-card reveal" style="--d:.1s">
+        <h3>Права доступа</h3>
+        <ul class="perms">
+          <li class="ok">Просмотр витрины кофе</li>
+          <li class="ok">Просмотр своего профиля</li>
+          <li class="{{ 'ok' if record.role == 'admin' else 'no' }}">Добавление и изменение напитков</li>
+          <li class="{{ 'ok' if record.role == 'admin' else 'no' }}">Удаление позиций с витрины</li>
+          <li class="{{ 'ok' if record.role == 'admin' else 'no' }}">Смена аватара</li>
+        </ul>
+        {% if record.role != 'admin' %}
+          <p class="hint">Роль «читатель» — только просмотр, по техническому заданию.</p>
+        {% endif %}
+      </div>
+
+      {% if user and user.role == 'admin' %}
+      <form class="form-card reveal" style="--d:.18s" method="post" action="/profile/avatar" enctype="multipart/form-data" id="avatarForm">
+        <h3>Сменить аватар</h3>
+        <label class="dropzone" id="dropzone">
+          <input type="file" name="avatar" id="avatarInput" accept=".png,.jpg,.jpeg,.gif,.webp,image/*" required hidden>
+          <svg class="dz-ico" viewBox="0 0 24 24"><path d="M12 16V4m0 0 4 4m-4-4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span class="dz-title">Перетащите изображение сюда</span>
+          <span class="dz-sub">или нажмите, чтобы выбрать · png, jpg, gif, webp · до 2 МБ</span>
+          <span class="dz-file" id="dzFile"></span>
+        </label>
+        <button class="btn btn-primary btn-block" type="submit">Загрузить аватар</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

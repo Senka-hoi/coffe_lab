@@ -1,116 +1,759 @@
 <!doctype html>
+<!-- Coffee House · 404/403/400/500. Самостоятельный файл и Jinja2-шаблон: code, message, user, request. -->
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Coffee House — очень вкусная витрина разновидностей и вариаций кофе">
-  <title>{% block title %}Coffee House{% endblock %} · Coffee House</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E☕%3C/text%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600;1,900&family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 · Coffee House</title>
+<meta name="description" content="Пропал без вести мешок кофе — и ваша страница заодно. Листок розыска, приметы, вознаграждение и контакты фермера Абебе.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,700&family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --espresso:#1E0F07;--roast:#3B2416;--bean:#5A3A22;
+  --cherry:#C93A2E;--leaf:#6F9A4E;--coldbrew:#3E6B92;--amber:#F5B544;--crema:#F0C987;
+  --accent:#E8933A;--accent-2:#F5B544;--on-accent:#1E0F07;--accent-dark:#A05A18;--glow:232,147,58;
+  --bg:#F6EFE4;--surface:#FFFAF1;--surface-2:#EFE4D2;--overlay:#FFFCF6;
+  --text:#2B1A10;--muted:#7A6555;--line:#E2D3BD;--line-strong:#CDB795;--accent-text:#A05A18;
+  --ok-text:#3F6129;--bad-text:#A02C22;--warn-text:#8A5D0C;--info-text:#2F5A7D;
+  --shadow:0 22px 50px -26px rgba(43,26,16,.55);
+  --paper:#FFFCF4;--paper-ink:#2B1A10;--paper-muted:#7A6555;--paper-line:#C9B79C;
+  --skin:#8A5A3B;--burlap:#C98A4B;
+  --nav-h:68px;--r-lg:24px;--r-md:16px;--r-sm:11px;
+  --display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hand:"Caveat","Segoe Script",cursive;--ease:cubic-bezier(.2,.7,.3,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-color:var(--accent) var(--surface-2);scrollbar-width:thin}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.55;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+button{font:inherit;color:inherit}
+a{color:var(--accent-text)}
+::selection{background:var(--accent);color:var(--on-accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+[hidden]{display:none!important}
+::-webkit-scrollbar{width:13px;height:13px}
+::-webkit-scrollbar-track{background:var(--surface-2)}
+::-webkit-scrollbar-thumb{border-radius:9px;border:3px solid var(--surface-2);background:linear-gradient(var(--accent),var(--bean))}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(var(--accent-2),var(--accent))}
+.grain{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.06;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)'/%3E%3C/svg%3E")}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.aurora i{position:absolute;border-radius:50%;filter:blur(95px)}
+.aurora .a1{width:50vw;height:50vw;top:-16%;left:-10%;background:radial-gradient(circle,rgba(var(--glow),.4),transparent 70%);animation:drift 27s ease-in-out infinite alternate}
+.aurora .a2{width:42vw;height:42vw;bottom:-18%;right:-8%;background:radial-gradient(circle,rgba(201,58,46,.22),transparent 70%);animation:drift 34s ease-in-out infinite alternate-reverse}
+.aurora .a3{width:32vw;height:32vw;top:40%;left:44%;background:radial-gradient(circle,rgba(111,154,78,.16),transparent 70%);animation:drift 41s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(7%,-6%) scale(1.12)}}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:50;display:flex;align-items:center;gap:14px;padding:0 clamp(14px,3.4vw,34px);background:linear-gradient(110deg,rgba(30,15,7,.94),rgba(59,36,22,.94) 58%,rgba(90,58,34,.94));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(var(--glow),.4);transition:box-shadow .3s}
+.topbar.scrolled{box-shadow:0 16px 34px -18px rgba(10,5,2,.85)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#F6EFE4;font-family:var(--display);font-size:20px;font-weight:800}
+.brand svg{width:34px;height:auto;aspect-ratio:154/120}
+.brand em{color:var(--crema);font-style:italic}
+.top-nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+.top-nav a{color:#E9DCC8;text-decoration:none;font-size:14px;font-weight:700;padding:9px 15px;border-radius:999px;transition:.2s}
+.top-nav a:hover{background:rgba(255,255,255,.1);color:#FFF6EC}
+.top-nav .cta{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent)}
+.who{display:flex;align-items:center;gap:8px;color:#F6EFE4;font-size:13px;font-weight:700;padding-left:6px}
+.who i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent)}
+main{padding-top:var(--nav-h)}
+.stage{position:relative;width:min(1180px,94%);margin:0 auto;padding:clamp(30px,5vw,64px) 0 clamp(40px,6vw,72px);display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(24px,4vw,56px);align-items:start;scroll-margin-top:calc(var(--nav-h) + 16px)}
+.beans{position:absolute;inset:0;pointer-events:none;transition:transform .5s var(--ease)}
+.beans svg{position:absolute;left:var(--x);top:var(--y);width:calc(30px*var(--s,1));height:auto;aspect-ratio:40/56;color:var(--c,rgba(var(--glow),.4));transform:rotate(var(--r,0deg));animation:floaty 6.5s ease-in-out infinite alternate;animation-delay:var(--d,0s);filter:drop-shadow(0 10px 12px rgba(0,0,0,.2))}
+@keyframes floaty{from{transform:rotate(var(--r,0deg)) translateY(0)}to{transform:rotate(var(--r,0deg)) translateY(-16px)}}
+.art-col{position:relative;text-align:center}
+.eyebrow{margin:0;text-transform:uppercase;letter-spacing:.26em;font-size:11px;font-weight:800;color:var(--accent-text)}
+.scene{position:relative;margin:14px auto 0;width:min(560px,100%);border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line-strong);box-shadow:var(--shadow);background:#FBEED6}
+.scene>svg{width:100%;height:auto}
+.scene-note{position:absolute;right:14px;bottom:12px;font-family:var(--hand);font-size:22px;color:var(--accent-dark);transform:rotate(-4deg);background:rgba(255,252,244,.82);padding:2px 12px;border-radius:999px;backdrop-filter:blur(3px)}
+.code{font-family:var(--display);font-size:clamp(88px,13vw,156px);font-weight:800;line-height:.95;margin-top:14px;background:linear-gradient(135deg,var(--roast),var(--accent) 55%,var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.art-col h1{font-family:var(--display);font-weight:800;font-size:clamp(24px,3vw,36px);line-height:1.15;margin:12px 0 8px}
+.art-col .lead{color:var(--muted);font-size:15px;margin:0 auto;max-width:48ch}
+.scene-toggle{margin-top:18px}
+.sun-rays{transform-box:fill-box;transform-origin:center;animation:rays 44s linear infinite}
+@keyframes rays{to{transform:rotate(360deg)}}
+.cloud{transform-box:fill-box;animation:cloud 9s ease-in-out infinite alternate}
+.cloud.c2{animation-duration:13s;animation-delay:1.2s}
+@keyframes cloud{from{transform:translateX(-14px)}to{transform:translateX(18px)}}
+.qs text{transform-box:fill-box;animation:qbob 1.6s ease-in-out infinite alternate}
+.qs text:nth-child(2){animation-delay:.45s}
+@keyframes qbob{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+.sweat{transform-box:fill-box;animation:sweat 1.8s ease-in infinite}
+@keyframes sweat{0%{transform:translateY(0);opacity:0}25%{opacity:1}100%{transform:translateY(16px);opacity:0}}
+.qs,.sweat,.spot,.prints{transition:opacity .35s}
+.face-sad{opacity:1;transition:opacity .3s}
+.face-happy{opacity:0;transition:opacity .3s}
+.mag{opacity:0;transform-box:fill-box}
+.searching .mag{animation:sweep 1.7s ease-in-out forwards}
+@keyframes sweep{0%{transform:translate(0,0);opacity:0}12%{opacity:1}45%{transform:translate(150px,42px)}78%{transform:translate(292px,62px);opacity:1}100%{transform:translate(300px,64px);opacity:0}}
+.searching .prints ellipse{animation:printPulse .7s ease-in-out infinite}
+.searching .prints ellipse:nth-child(2n){animation-delay:.18s}
+.searching .prints ellipse:nth-child(3n){animation-delay:.36s}
+@keyframes printPulse{0%,100%{opacity:.25}50%{opacity:.95}}
+.sack{transform-box:fill-box;transform-origin:50% 100%;transform:scale(0);opacity:0;transition:transform .65s cubic-bezier(.34,1.56,.64,1),opacity .35s}
+.found .sack{transform:scale(1);opacity:1}
+.found .face-sad{opacity:0}
+.found .face-happy{opacity:1}
+.found .qs,.found .sweat{opacity:0}
+.found .spot{opacity:.22}
+.found .prints{opacity:.15}
+
+/* ============ листок «пропал без вести» ============ */
+.poster-col{position:relative}
+.poster{position:relative;background:var(--paper);color:var(--paper-ink);padding:30px 26px 20px;
+  transform:rotate(-1.3deg);transition:transform .35s var(--ease),box-shadow .35s;
+  box-shadow:0 30px 52px -24px rgba(43,26,16,.65),0 2px 0 rgba(43,26,16,.08);border-radius:3px}
+.poster:hover{transform:rotate(0deg) translateY(-4px);box-shadow:0 36px 60px -26px rgba(43,26,16,.7)}
+.poster::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:multiply;border-radius:3px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)'/%3E%3C/svg%3E")}
+.tape{position:absolute;top:-13px;width:104px;height:28px;background:linear-gradient(180deg,rgba(240,201,135,.72),rgba(232,147,58,.5));
+  box-shadow:0 3px 8px -4px rgba(43,26,16,.6);opacity:.92}
+.tape::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 3px,transparent 3px 7px);opacity:.5}
+.tape.t1{left:18px;transform:rotate(-7deg);clip-path:polygon(3% 0,97% 4%,100% 96%,0 100%)}
+.tape.t2{right:18px;transform:rotate(6deg);clip-path:polygon(0 4%,96% 0,100% 100%,3% 94%)}
+.poster-head{text-align:center;border-bottom:3px double var(--paper-line);padding-bottom:12px;margin-bottom:14px}
+.poster-kicker{font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--paper-muted);margin:0 0 6px}
+.poster-head h2{font-family:var(--display);font-weight:800;font-size:clamp(26px,3.2vw,36px);line-height:1;letter-spacing:.02em;
+  color:var(--bad-text);margin:0;text-transform:uppercase}
+.poster-sub{margin:8px 0 0;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-muted)}
+.poster-photo{position:relative;border:2px solid var(--paper-ink);background:
+  repeating-linear-gradient(180deg,transparent 0 27px,rgba(43,26,16,.16) 27px 28px),
+  linear-gradient(180deg,#EFE4D2,#E2D3BD);
+  padding:10px 12px 6px;display:flex;align-items:flex-end;justify-content:center;gap:10px;overflow:hidden}
+.photo-marks{position:absolute;left:6px;top:6px;bottom:6px;display:flex;flex-direction:column;justify-content:space-between;
+  font-family:ui-monospace,Menlo,monospace;font-size:9px;color:var(--paper-muted)}
+.poster-photo svg{width:132px;height:auto;position:relative;z-index:1}
+.photo-tag{position:absolute;right:8px;bottom:8px;background:var(--paper);border:1.5px solid var(--paper-ink);
+  font-family:ui-monospace,Menlo,monospace;font-size:10px;padding:3px 8px;transform:rotate(-3deg);z-index:2}
+.poster-name{text-align:center;font-family:var(--display);font-size:22px;font-weight:800;margin:12px 0 2px}
+.poster-alias{text-align:center;font-family:var(--hand);font-size:20px;color:var(--accent-dark);margin:0 0 12px}
+.poster-facts{margin:0;font-size:13px}
+.poster-facts div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--paper-line)}
+.poster-facts dt{color:var(--paper-muted);flex:none}
+.poster-facts dd{margin:0;font-weight:700;text-align:right;word-break:break-word}
+.poster-facts dd.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:600}
+.poster-signs{margin:12px 0 0;font-size:12.5px;line-height:1.6;color:#4A3626}
+.poster-signs b{display:block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-muted);margin-bottom:3px}
+.poster-reward{margin:14px 0 0;border:2px solid var(--accent-dark);border-radius:6px;padding:10px 12px;text-align:center;
+  background:linear-gradient(135deg,rgba(232,147,58,.14),rgba(245,181,68,.16))}
+.poster-reward b{display:block;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-dark)}
+.poster-reward span{font-family:var(--display);font-size:19px;font-weight:800}
+.poster-foot{margin:12px 0 0;font-size:11.5px;color:var(--paper-muted);text-align:center}
+.stamp{position:absolute;right:14px;top:112px;transform:rotate(-15deg);border:3px double var(--bad-text);color:var(--bad-text);
+  font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.16em;text-transform:uppercase;
+  padding:7px 13px;border-radius:6px;opacity:.86;background:rgba(255,252,244,.5);pointer-events:none;z-index:3;transition:.35s var(--ease)}
+.poster.found .stamp{border-color:var(--ok-text);color:var(--ok-text);transform:rotate(-9deg) scale(1.06)}
+.tabs-head{display:flex;align-items:center;gap:8px;margin:16px 0 0;color:var(--paper-muted);font-size:11px}
+.tabs-head::before,.tabs-head::after{content:"";flex:1;border-top:1.5px dashed var(--paper-line)}
+.tabs{display:grid;grid-template-columns:repeat(8,1fr);gap:0;margin:6px -6px 0}
+.tab{position:relative;height:104px;border:0;border-left:1.5px dashed var(--paper-line);background:transparent;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:6px 2px;transition:background .2s,transform .2s}
+.tab:first-child{border-left:0}
+.tab span{writing-mode:vertical-rl;text-orientation:mixed;font-size:10.5px;font-weight:700;letter-spacing:.04em;color:#4A3626;white-space:nowrap}
+.tab:hover{background:rgba(232,147,58,.14);transform:translateY(3px)}
+.tab.torn{animation:tear .5s var(--ease) forwards;pointer-events:none}
+@keyframes tear{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(70px) rotate(14deg);opacity:0}}
+.tabs-note{margin:10px 0 0;font-size:11.5px;color:var(--paper-muted);text-align:center;min-height:17px}
+.tabs-note b{color:var(--accent-dark)}
+.poster-tools{display:flex;justify-content:center;margin-top:8px}
+.link-btn{border:0;background:transparent;color:var(--accent-dark);font-size:12px;font-weight:800;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;padding:6px 10px;border-radius:8px}
+.link-btn:hover{background:rgba(232,147,58,.14)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;cursor:pointer;font-weight:800;font-size:15px;padding:13px 24px;border-radius:999px;text-decoration:none;transition:transform .16s var(--ease),box-shadow .22s,filter .2s,background .2s,color .2s}
+.btn:active{transform:scale(.975)}
+.btn:disabled{opacity:.7;pointer-events:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);box-shadow:0 12px 26px -12px rgba(var(--glow),.95)}
+.btn-primary:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.btn-outline{border-color:color-mix(in srgb,var(--accent-text) 55%,transparent);color:var(--accent-text);background:transparent}
+.btn-outline:hover{background:rgba(var(--glow),.14);transform:translateY(-2px)}
+.btn-ghost{background:var(--surface-2);color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{background:color-mix(in srgb,var(--accent) 18%,var(--surface-2));transform:translateY(-2px)}
+.next{background:linear-gradient(180deg,#241209,#3B2416);color:#F6EFE4;padding:clamp(36px,5vw,64px) 0;scroll-margin-top:calc(var(--nav-h) + 16px)}
+.next-inner{width:min(1180px,94%);margin:0 auto}
+.next .eyebrow{color:var(--crema)}
+.next h2{font-family:var(--display);font-size:clamp(24px,3vw,36px);margin:8px 0 20px}
+.nav-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.nav-card{position:relative;display:block;text-decoration:none;color:#F6EFE4;background:rgba(255,250,241,.05);border:1px solid rgba(var(--glow),.3);border-radius:var(--r-lg);padding:22px;transition:.25s}
+.nav-card:hover{background:rgba(255,250,241,.1);transform:translateY(-5px);border-color:rgba(var(--glow),.6)}
+.nav-card .ico{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,rgba(var(--glow),.3),rgba(201,58,46,.22));border:1px solid rgba(var(--glow),.45);margin-bottom:14px}
+.nav-card .ico svg{width:24px;height:24px}
+.nav-card h3{font-family:var(--display);font-size:21px;margin:0 0 6px}
+.nav-card p{color:#CBB79E;font-size:13.5px;margin:0}
+.nav-card .go{position:absolute;top:20px;right:20px;color:var(--crema);font-weight:800;transition:transform .25s}
+.nav-card:hover .go{transform:translateX(5px)}
+.footer{background:#1D0E06;color:#B9A48C;text-align:center;font-size:12.5px;padding:22px 16px;border-top:1px solid rgba(var(--glow),.25)}
+.confetti{position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden}
+.confetti svg{position:absolute;top:-6vh;left:var(--cx);width:var(--cw,18px);height:auto;aspect-ratio:40/56;color:var(--cc);animation:fall var(--cd,2.6s) cubic-bezier(.35,.1,.6,1) forwards}
+@keyframes fall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(112vh) rotate(var(--cr,540deg));opacity:0}}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:80;opacity:0;pointer-events:none;background:linear-gradient(135deg,var(--roast),var(--espresso));color:#FFF6EC;font-size:13.5px;font-weight:700;padding:12px 20px;border-radius:999px;border:1px solid rgba(var(--glow),.55);box-shadow:0 18px 36px -18px rgba(0,0,0,.9);transition:opacity .25s,transform .25s var(--ease);max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s var(--ease) var(--d,0s),transform .65s var(--ease) var(--d,0s)}
+.reveal.in{opacity:1;transform:none}
+.staged{opacity:0;animation:rise .8s var(--ease) forwards;animation-delay:var(--d,0s)}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@media (max-width:960px){
+  .stage{grid-template-columns:1fr;padding-top:34px}
+  .poster{transform:rotate(0)}
+  .stamp{top:104px;right:10px}
+}
+@media (max-width:560px){
+  .brand span{display:none}
+  .top-nav a{padding:9px 12px;font-size:13px}
+  .actions .btn{flex:1 1 100%}
+  .scene-note{font-size:18px;right:8px;bottom:8px}
+  .poster{padding:26px 16px 16px}
+  .tabs{grid-template-columns:repeat(4,1fr);row-gap:4px}
+  .tab{height:88px;border-left:1.5px dashed var(--paper-line)}
+  .tab:nth-child(4n+1){border-left:0}
+  .stamp{font-size:14px;padding:5px 10px;top:auto;bottom:150px;right:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  html{scroll-behavior:auto}
+  .reveal,.staged{opacity:1;transform:none}
+}
+@media print{
+  .topbar,.aurora,.grain,.beans,.art-col,.actions,.next,.footer,.confetti,.toast,.poster-tools,.tabs-head{display:none!important}
+  body{background:#fff}
+  main{padding:0}
+  .stage{display:block;width:100%;padding:0;margin:0}
+  .poster{transform:none!important;box-shadow:none;border:1px solid #999;page-break-inside:avoid}
+  .tape{display:none}
+  .reveal{opacity:1!important;transform:none!important}
+}
+</style>
 </head>
-<body data-auth="{{ 1 if user else 0 }}">
-{% set user = user|default(None) %}
-{% set path = request.url.path %}
+<body>
 
-<!-- SVG-символы: чашка и зерно -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <symbol id="bean" viewBox="0 0 40 56">
-      <ellipse cx="20" cy="28" rx="16" ry="24" fill="currentColor"/>
-      <path d="M20 5 C 9 18, 31 38, 20 51" fill="none" stroke="rgba(0,0,0,.32)" stroke-width="4" stroke-linecap="round"/>
-    </symbol>
-    <symbol id="cup" viewBox="0 0 154 120">
-      <ellipse cx="70" cy="105" rx="54" ry="9" fill="var(--saucer, rgba(36,18,9,.16))"/>
-      <path d="M122 58 h10 a15 15 0 0 1 0 30 h-9" fill="none" stroke="var(--cup,#e8933a)" stroke-width="7" stroke-linecap="round"/>
-      <path d="M18 52 h104 v12 a52 42 0 0 1 -104 0 z" fill="var(--cup,#e8933a)"/>
-      <ellipse cx="70" cy="52" rx="52" ry="8" fill="var(--coffee,#3b2416)"/>
-      <ellipse cx="70" cy="52" rx="40" ry="5.5" fill="var(--crema,#b0713f)" opacity=".85"/>
-      <ellipse cx="62" cy="51" rx="14" ry="2.6" fill="#f0c987" opacity=".5"/>
-      <path class="steam s1" d="M48 40 C 43 32, 53 26, 48 14" fill="none" stroke="var(--steam, rgba(255,244,230,.75))" stroke-width="4" stroke-linecap="round"/>
-      <path class="steam s2" d="M70 42 C 65 32, 75 26, 70 10" fill="none" stroke="var(--steam, rgba(255,244,230,.75))" stroke-width="4" stroke-linecap="round"/>
-      <path class="steam s3" d="M92 40 C 87 32, 97 26, 92 14" fill="none" stroke="var(--steam, rgba(255,244,230,.75))" stroke-width="4" stroke-linecap="round"/>
-    </symbol>
-  </defs>
-</svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="bean" viewBox="0 0 40 56"><ellipse cx="20" cy="28" rx="16" ry="24" fill="currentColor"/><path d="M20 5C9 18 31 38 20 51" fill="none" stroke="rgba(0,0,0,.34)" stroke-width="4" stroke-linecap="round"/></symbol>
+  <symbol id="cup" viewBox="0 0 154 120">
+    <ellipse cx="70" cy="105" rx="54" ry="9" fill="var(--saucer,rgba(0,0,0,.3))"/>
+    <path d="M122 58h10a15 15 0 0 1 0 30h-9" fill="none" stroke="var(--cupc,#E8933A)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M18 52h104v12a52 42 0 0 1-104 0z" fill="var(--cupc,#E8933A)"/>
+    <ellipse cx="70" cy="52" rx="52" ry="8" fill="#2A170C"/><ellipse cx="70" cy="52" rx="40" ry="5.5" fill="#B0713F" opacity=".9"/><ellipse cx="62" cy="51" rx="14" ry="2.6" fill="#F0C987" opacity=".55"/>
+    <path class="st st1" d="M48 40C43 32 53 26 48 14" fill="none" stroke="var(--steam,rgba(255,240,220,.8))" stroke-width="4" stroke-linecap="round"/>
+    <path class="st st2" d="M70 42C65 32 75 26 70 10" fill="none" stroke="var(--steam,rgba(255,240,220,.8))" stroke-width="4" stroke-linecap="round"/>
+    <path class="st st3" d="M92 40C87 32 97 26 92 14" fill="none" stroke="var(--steam,rgba(255,240,220,.8))" stroke-width="4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="mugsack" viewBox="0 0 120 150">
+    <ellipse cx="60" cy="140" rx="42" ry="7" fill="#5A3A22" opacity=".22"/>
+    <path d="M28 44 q -6 -16 9 -21 q 5 -11 23 -11 q 18 0 23 11 q 15 5 9 21 q 9 40 -6 62 q -26 12 -52 0 q -15 -22 -6 -62 z" fill="#C98A4B" stroke="#5A3A22" stroke-width="3"/>
+    <path d="M43 22 q 17 10 34 0" stroke="#5A3A22" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M50 16 q 10 -11 20 0" stroke="#3B2416" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M38 44 v 62 M60 40 v 70 M82 44 v 62" stroke="#5A3A22" stroke-width="1.8" opacity=".38"/>
+    <text x="60" y="82" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-size="15" font-weight="800" fill="#3B2416" transform="rotate(-4 60 82)">COFFEE</text>
+    <ellipse cx="60" cy="102" rx="8" ry="11" fill="#3B2416"/><path d="M60 94 c -4 6 4 11 0 17" stroke="#C98A4B" stroke-width="2" fill="none"/>
+  </symbol>
+</defs></svg>
+<style>.st{animation:steam 2.9s ease-in-out infinite}.st2{animation-delay:.9s}.st3{animation-delay:1.75s}@keyframes steam{0%{opacity:0;transform:translateY(5px)}35%{opacity:.95}100%{opacity:0;transform:translateY(-8px)}}</style>
 
-<div class="bg-aurora" aria-hidden="true"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i></div>
+<div class="aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
 <div class="grain" aria-hidden="true"></div>
 
 <header class="topbar" id="topbar">
-  <a class="brand" href="/">
-    <svg class="brand-cup" viewBox="0 0 154 120" style="--cup:#e8933a;--steam:rgba(240,201,135,.9)"><use href="#cup"/></svg>
-    <span class="brand-name">Coffee<em>House</em></span>
-  </a>
-
-  <nav class="nav" id="nav" aria-label="Основная навигация">
-    {% if user %}
-      <a href="/" class="nav-link {{ 'active' if path == '/' else '' }}">Витрина</a>
-      <a href="/profile" class="nav-link {{ 'active' if path.startswith('/profile') else '' }}">Профиль</a>
-      {% if user.role == 'admin' %}
-        <a href="/edit" class="nav-link {{ 'active' if path.startswith('/edit') else '' }}">Управление</a>
-      {% endif %}
-    {% else %}
-      <a href="/login" class="nav-link {{ 'active' if path == '/login' else '' }}">Вход</a>
-      <a href="/register" class="nav-link {{ 'active' if path == '/register' else '' }}">Регистрация</a>
-    {% endif %}
+  <a class="brand" href="/"><svg viewBox="0 0 154 120" style="--cupc:#E8933A;--steam:rgba(240,201,135,.9);--saucer:rgba(0,0,0,.25)"><use href="#cup"/></svg><span>Coffee<em>House</em></span></a>
+  <nav class="top-nav" aria-label="Основная навигация">
+    <a href="/">Витрина</a>
+    <a href="/login" id="navLoginTop">Вход</a>
+    <a href="/register" class="cta" id="navRegisterTop">Регистрация</a>
+    <a href="/profile" class="cta" id="navProfileTop" hidden>Профиль</a>
+    <span class="who" id="who" hidden><i id="whoInitial">A</i><span id="whoName"></span></span>
   </nav>
-
-  <div class="top-right">
-    {% if user %}
-      <div class="session-pill" id="sessionPill" title="Сессия истекает через 5 минут бездействия">
-        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 2h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <span id="sessionTime">5:00</span>
-      </div>
-      <a class="user-chip" href="/profile" title="Открыть профиль">
-        <span class="mini-avatar">{{ user.login[0]|upper }}</span>
-        <span class="user-name">{{ user.login }}</span>
-        <span class="role-dot {{ user.role }}" title="{{ 'Администратор' if user.role == 'admin' else 'Читатель' }}"></span>
-      </a>
-      <a class="btn btn-ghost btn-sm" href="/logout">Выйти</a>
-    {% else %}
-      <a class="btn btn-ghost btn-sm" href="/login">Войти</a>
-      <a class="btn btn-primary btn-sm" href="/register">Регистрация</a>
-    {% endif %}
-    <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span><span></span><span></span></button>
-  </div>
 </header>
 
-<main>{% block content %}{% endblock %}</main>
-
-<footer class="footer">
-  <div>☕ Coffee House — учебная витрина кофе на FastAPI</div>
-  <div class="footer-note">сессия 5 минут · users.csv + data.csv · все действия пишутся в logs</div>
-</footer>
-
-<!-- Подтверждение удаления -->
-<div class="modal" id="confirmModal" hidden>
-  <div class="scrim" data-close></div>
-  <div class="dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
-    <h3 id="confirmTitle">Подтвердите действие</h3>
-    <p id="confirmText" class="muted"></p>
-    <div class="dialog-actions">
-      <button class="btn btn-ghost" type="button" data-close>Отмена</button>
-      <button class="btn btn-danger" type="button" id="confirmYes">Удалить</button>
+<main>
+  <section class="stage" id="top">
+    <div class="beans" id="beans" aria-hidden="true">
+      <svg viewBox="0 0 40 56" style="--x:4%;--y:12%;--r:-22deg;--s:1.1"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:44%;--y:6%;--r:26deg;--s:.75;--d:1.1s;--c:rgba(201,58,46,.35)"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:90%;--y:18%;--r:-14deg;--s:1.2;--d:.5s;--c:rgba(111,154,78,.35)"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:10%;--y:78%;--r:34deg;--s:.9;--d:1.7s"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:82%;--y:82%;--r:-30deg;--s:1;--d:2.3s;--c:rgba(62,107,146,.35)"><use href="#bean"/></svg>
     </div>
-  </div>
-</div>
 
-{% if user %}
-<!-- Сессия истекла -->
-<div class="modal" id="sessionModal" hidden>
-  <div class="scrim"></div>
-  <div class="dialog session-dialog" role="alertdialog" aria-modal="true" aria-labelledby="sessionTitle">
-    <svg class="session-cup" viewBox="0 0 154 120" style="--cup:#d8c6b0;--coffee:#b9a48c;--crema:#cbb79e;--steam:rgba(138,115,96,.45)"><use href="#cup"/></svg>
-    <h3 id="sessionTitle">Сессия остыла</h3>
-    <p class="muted">Прошло 5 минут бездействия. Войдите снова — кофе уже ждёт.</p>
-    <a class="btn btn-primary btn-block" href="/login">Войти заново</a>
-  </div>
-</div>
-{% endif %}
+    <div class="art-col">
+      <p class="eyebrow staged" id="eyebrow">заказ не найден</p>
 
-<script src="/static/app.js" defer></script>
+      <div class="scene staged" id="scene" style="--d:.08s" role="img" aria-label="Фермер Абебе на кофейной плантации в Эфиопии разводит руками: мешок кофе пропал, остались следы и зёрна">
+        <svg viewBox="0 0 560 430">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBEED6"/><stop offset=".6" stop-color="#F7DFAE"/><stop offset="1" stop-color="#F0C987"/></linearGradient>
+            <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9D3AC"/><stop offset="1" stop-color="#D9B98C"/></linearGradient>
+            <linearGradient id="hillA" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A8B84A"/><stop offset="1" stop-color="#6F9A4E"/></linearGradient>
+            <linearGradient id="hillB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6F9A4E"/><stop offset="1" stop-color="#4C7034"/></linearGradient>
+            <linearGradient id="burl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D9A05B"/><stop offset="1" stop-color="#B0713F"/></linearGradient>
+          </defs>
+          <rect width="560" height="310" fill="url(#sky)"/>
+          <g class="sun-rays" stroke="#F5B544" stroke-width="5" stroke-linecap="round" opacity=".8">
+            <line x1="470" y1="18" x2="470" y2="30"/><line x1="470" y1="110" x2="470" y2="122"/>
+            <line x1="418" y1="70" x2="430" y2="70"/><line x1="510" y1="70" x2="522" y2="70"/>
+            <line x1="433" y1="33" x2="442" y2="42"/><line x1="498" y1="98" x2="507" y2="107"/>
+            <line x1="507" y1="33" x2="498" y2="42"/><line x1="442" y1="98" x2="433" y2="107"/>
+          </g>
+          <circle cx="470" cy="70" r="30" fill="#F5B544"/><circle cx="470" cy="70" r="22" fill="#F0C987"/>
+          <g class="cloud" fill="#FFFCF4" opacity=".85"><ellipse cx="120" cy="62" rx="42" ry="14"/><ellipse cx="150" cy="52" rx="26" ry="11"/></g>
+          <g class="cloud c2" fill="#FFFCF4" opacity=".7"><ellipse cx="320" cy="42" rx="34" ry="11"/><ellipse cx="345" cy="34" rx="20" ry="9"/></g>
+          <path d="M0 250 Q 140 190 300 240 T 560 225 V 310 H 0 Z" fill="url(#hillA)" opacity=".75"/>
+          <path d="M0 285 Q 180 235 360 275 T 560 265 V 310 H 0 Z" fill="url(#hillB)"/>
+          <g fill="#4C7034">
+            <circle cx="60" cy="272" r="13"/><circle cx="95" cy="266" r="13"/><circle cx="130" cy="262" r="13"/>
+            <circle cx="330" cy="268" r="13"/><circle cx="365" cy="264" r="13"/><circle cx="400" cy="262" r="13"/>
+          </g>
+          <g fill="#C93A2E">
+            <circle cx="56" cy="268" r="2.6"/><circle cx="66" cy="274" r="2.6"/><circle cx="92" cy="262" r="2.6"/><circle cx="101" cy="269" r="2.6"/>
+            <circle cx="327" cy="264" r="2.6"/><circle cx="337" cy="271" r="2.6"/><circle cx="362" cy="260" r="2.6"/><circle cx="398" cy="258" r="2.6"/>
+          </g>
+          <path d="M78 300 C 76 262 70 240 62 224 M78 300 C 80 258 92 238 104 226" stroke="#3B2416" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <ellipse cx="82" cy="216" rx="62" ry="17" fill="#5A3A22"/><ellipse cx="52" cy="226" rx="30" ry="10" fill="#3B2416"/><ellipse cx="116" cy="226" rx="30" ry="10" fill="#3B2416"/>
+          <path d="M0 300 H 560 V 430 H 0 Z" fill="url(#ground)"/>
+          <path d="M0 300 Q 280 288 560 300 V 316 Q 280 304 0 316 Z" fill="#C9A876" opacity=".6"/>
+          <g transform="rotate(-4 105 300)">
+            <rect x="100" y="300" width="7" height="62" rx="3" fill="#5A3A22"/>
+            <rect x="62" y="248" width="86" height="60" rx="6" fill="#FFFCF4" stroke="#CDB795"/>
+            <text x="105" y="266" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-size="10" font-weight="800" fill="#A02C22">ПРОПАЛ МЕШОК</text>
+            <text x="105" y="280" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-size="8.5" fill="#2B1A10">арабика · 60 кг</text>
+            <text x="105" y="293" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-size="8.5" fill="#7A6555">награда: капучино</text>
+            <path d="M96 297 h18 v6 a9 7 0 0 1 -18 0 z" fill="#C98A4B"/>
+          </g>
+          <g class="prints" fill="#5A3A22" opacity=".4">
+            <ellipse cx="352" cy="356" rx="6" ry="3.4"/><ellipse cx="366" cy="350" rx="6" ry="3.4"/>
+            <ellipse cx="382" cy="352" rx="6" ry="3.4"/><ellipse cx="396" cy="346" rx="6" ry="3.4"/>
+            <ellipse cx="412" cy="348" rx="6" ry="3.4"/><ellipse cx="426" cy="342" rx="6" ry="3.4"/>
+          </g>
+          <g class="spot">
+            <path d="M312 316 q -4 -14 8 -18 q 4 -8 14 -8 q 10 0 14 8 q 12 4 8 18 q 6 26 -4 40 q -18 8 -36 0 q -10 -14 -4 -40 z" fill="rgba(255,252,244,.35)" stroke="#A05A18" stroke-width="2.5" stroke-dasharray="7 6"/>
+            <text x="334" y="342" text-anchor="middle" font-family="Playfair Display,Georgia,serif" font-size="26" font-weight="800" fill="#A05A18">?</text>
+            <g transform="rotate(8 356 366)"><rect x="344" y="360" width="30" height="14" rx="3" fill="#FFFCF4" stroke="#CDB795"/><text x="359" y="370" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-size="8" fill="#7A6555">60 кг</text></g>
+          </g>
+          <g>
+            <ellipse cx="231" cy="382" rx="46" ry="8" fill="#5A3A22" opacity=".22"/>
+            <rect x="214" y="318" width="15" height="56" rx="7" fill="#3B2416"/>
+            <rect x="238" y="318" width="15" height="56" rx="7" fill="#3B2416"/>
+            <ellipse cx="220" cy="376" rx="13" ry="5" fill="#5A3A22"/><ellipse cx="247" cy="376" rx="13" ry="5" fill="#5A3A22"/>
+            <path d="M206 262 C 188 268 176 276 166 284" stroke="#E8933A" stroke-width="13" fill="none" stroke-linecap="round"/>
+            <path d="M256 262 C 274 268 286 276 296 284" stroke="#E8933A" stroke-width="13" fill="none" stroke-linecap="round"/>
+            <path d="M166 284 l -8 4 M296 284 l 8 4" stroke="#8A5A3B" stroke-width="11" fill="none" stroke-linecap="round"/>
+            <circle cx="154" cy="286" r="8" fill="#8A5A3B"/><circle cx="308" cy="286" r="8" fill="#8A5A3B"/>
+            <path d="M204 252 q 27 -12 54 0 l 6 68 q -33 10 -66 0 z" fill="#E8933A"/>
+            <path d="M204 268 l 12 8 12 -8 12 8 12 -8 12 8" stroke="#C93A2E" stroke-width="4" fill="none"/>
+            <path d="M210 292 l 8 -6 8 6 8 -6 8 6 8 -6 8 6" stroke="#F0C987" stroke-width="3.5" fill="none"/>
+            <path d="M212 306 h 40" stroke="#4C7034" stroke-width="4" stroke-dasharray="6 5"/>
+            <circle cx="231" cy="222" r="27" fill="#8A5A3B"/>
+            <circle cx="204" cy="224" r="5" fill="#8A5A3B"/><circle cx="258" cy="224" r="5" fill="#8A5A3B"/>
+            <path d="M206 210 q 25 -18 50 0 l 0 -8 q -25 -14 -50 0 z" fill="#1E0F07"/>
+            <ellipse cx="231" cy="203" rx="42" ry="10" fill="#F0C987"/>
+            <path d="M207 202 q 24 -26 48 0 z" fill="#F5B544"/>
+            <path d="M207 200 q 24 8 48 0 l 0 5 q -24 8 -48 0 z" fill="#C93A2E"/>
+            <g class="face-sad">
+              <circle cx="222" cy="222" r="2.7" fill="#1E0F07"/><circle cx="240" cy="222" r="2.7" fill="#1E0F07"/>
+              <path d="M216 214 l 10 3 M246 214 l -10 3" stroke="#1E0F07" stroke-width="2.4" stroke-linecap="round"/>
+              <ellipse cx="231" cy="236" rx="4" ry="5" fill="#1E0F07"/>
+            </g>
+            <g class="face-happy">
+              <path d="M217 222 q 5 -5 10 0 M235 222 q 5 -5 10 0" stroke="#1E0F07" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+              <path d="M221 233 q 10 9 20 0" stroke="#1E0F07" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <circle cx="214" cy="230" r="4" fill="#C93A2E" opacity=".3"/><circle cx="248" cy="230" r="4" fill="#C93A2E" opacity=".3"/>
+            </g>
+            <path class="sweat" d="M262 210 q 5 7 0 11 q -5 -4 0 -11" fill="#3E6B92"/>
+            <g class="qs" font-family="Playfair Display,Georgia,serif" font-weight="800" fill="#A05A18">
+              <text x="182" y="182" font-size="26">?</text>
+              <text x="272" y="170" font-size="20">?</text>
+            </g>
+          </g>
+          <g class="mag">
+            <circle cx="150" cy="240" r="26" fill="rgba(62,107,146,.18)" stroke="#1E0F07" stroke-width="6"/>
+            <path d="M138 230 q 6 -8 16 -6" stroke="#FFFCF4" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
+            <line x1="169" y1="259" x2="188" y2="278" stroke="#1E0F07" stroke-width="9" stroke-linecap="round"/>
+          </g>
+          <g>
+            <circle cx="470" cy="330" r="52" fill="#4C7034"/><circle cx="432" cy="344" r="34" fill="#6F9A4E"/><circle cx="506" cy="346" r="34" fill="#6F9A4E"/>
+            <circle cx="452" cy="318" r="3.4" fill="#C93A2E"/><circle cx="478" cy="330" r="3.4" fill="#C93A2E"/><circle cx="496" cy="342" r="3.4" fill="#C93A2E"/><circle cx="438" cy="338" r="3.4" fill="#C93A2E"/><circle cx="466" cy="350" r="3.4" fill="#C93A2E"/>
+          </g>
+          <g class="sack">
+            <ellipse cx="452" cy="372" rx="40" ry="7" fill="#5A3A22" opacity=".25"/>
+            <path d="M424 322 q -5 -14 8 -18 q 4 -9 16 -9 q 12 0 16 9 q 13 4 8 18 q 7 28 -4 44 q -20 9 -40 0 q -11 -16 -4 -44 z" fill="url(#burl)" stroke="#5A3A22" stroke-width="2.5"/>
+            <path d="M436 300 q 12 8 24 0" stroke="#5A3A22" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M441 296 q 7 -8 14 0" stroke="#3B2416" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M432 316 v 44 M448 312 v 52 M464 316 v 44" stroke="#5A3A22" stroke-width="1.6" opacity=".4"/>
+            <text x="448" y="344" text-anchor="middle" font-family="Manrope,Arial,sans-serif" font-size="11" font-weight="800" fill="#3B2416" transform="rotate(-4 448 344)">COFFEE</text>
+            <ellipse cx="448" cy="356" rx="6" ry="8" fill="#3B2416"/><path d="M448 350 c -3 4 3 8 0 12" stroke="#C98A4B" stroke-width="1.6" fill="none"/>
+            <ellipse cx="416" cy="372" rx="5" ry="6.5" fill="#5A3A22" transform="rotate(-24 416 372)"/>
+            <ellipse cx="486" cy="374" rx="5" ry="6.5" fill="#5A3A22" transform="rotate(18 486 374)"/>
+          </g>
+          <g fill="#5A3A22">
+            <ellipse cx="300" cy="392" rx="5" ry="7" transform="rotate(-20 300 392)"/>
+            <ellipse cx="322" cy="400" rx="5" ry="7" transform="rotate(30 322 400)"/>
+            <ellipse cx="278" cy="404" rx="5" ry="7" transform="rotate(8 278 404)"/>
+            <ellipse cx="348" cy="392" rx="5" ry="7" transform="rotate(-40 348 392)"/>
+          </g>
+        </svg>
+        <span class="scene-note" id="sceneNote">ой, где же мешок…</span>
+      </div>
+
+      <div class="code staged" style="--d:.12s" id="codeBig">404</div>
+      <h1 class="staged" style="--d:.16s" id="title">Кажется, Абебе потерял мешок кофе</h1>
+      <p class="lead staged" style="--d:.24s" id="message">Фермер из Эфиопии обошёл всю плантацию: мешок арабики исчез вместе с этой страницей. Остались только зёрна да следы — поможем найти хотя бы мешок.</p>
+      <button type="button" class="btn btn-outline scene-toggle staged" style="--d:.3s" id="findBtn">🔍 Помочь Абебе найти мешок</button>
+    </div>
+
+    <div class="poster-col reveal" style="--d:.14s">
+      <article class="poster" id="poster" aria-label="Листок розыска: пропал без вести мешок кофе">
+        <span class="tape t1" aria-hidden="true"></span>
+        <span class="tape t2" aria-hidden="true"></span>
+        <span class="stamp" id="stamp">поиск идёт</span>
+
+        <header class="poster-head">
+          <p class="poster-kicker">Coffee House · плантация Сидамо</p>
+          <h2>Пропал без вести</h2>
+          <p class="poster-sub">мешок кофе · дело № <span id="pCase">0404</span></p>
+        </header>
+
+        <div class="poster-photo">
+          <span class="photo-marks" aria-hidden="true"><i>90 см</i><i>75 см</i><i>60 см</i><i>45 см</i></span>
+          <svg viewBox="0 0 120 150" role="img" aria-label="Фотография пропавшего мешка кофе"><use href="#mugsack"/></svg>
+          <span class="photo-tag">последнее фото</span>
+        </div>
+
+        <p class="poster-name">«Арабика № 60»</p>
+        <p class="poster-alias">в кругу зёрен — просто Мешок</p>
+
+        <dl class="poster-facts">
+          <div><dt>Пропал</dt><dd id="pDate">—</dd></div>
+          <div><dt>Ищем уже</dt><dd id="pTimer">00:00</dd></div>
+          <div><dt>Последний раз видели</dt><dd>у куста, третий ряд</dd></div>
+          <div><dt>Вес / рост</dt><dd>60 кг · 90 см</dd></div>
+          <div><dt>Пропал вместе с</dt><dd class="mono" id="pPath">/coffee/secret-menu</dd></div>
+          <div><dt>Статус</dt><dd id="pStatus">не найден</dd></div>
+        </dl>
+
+        <p class="poster-signs"><b>Особые приметы</b>
+          Джутовая ткань цвета карамели, штамп COFFEE на боку, завязан двойным узлом.
+          Пахнет шоколадом и цитрусом. При встрече не пугать: мешок пугливый и очень вкусный.
+        </p>
+
+        <div class="poster-reward">
+          <b>Вознаграждение нашедшему</b>
+          <span>капучино и круассан</span>
+        </div>
+
+        <p class="poster-foot">Свидетель: Абебе, фермер · просьба сообщать любую зацепку</p>
+
+        <p class="tabs-head">✂ оторвите контакт</p>
+        <div class="tabs" id="tabs">
+          <button type="button" class="tab" data-contact="Абебе · +251 91 000-60-40" aria-label="Оторвать контакт и скопировать номер"><span>Абебе +251 91 000-60-40</span></button>
+          <button type="button" class="tab" data-contact="Абебе · +251 91 000-60-40" aria-label="Оторвать контакт и скопировать номер"><span>Абебе +251 91 000-60-40</span></button>
+          <button type="button" class="tab" data-contact="Абебе · +251 91 000-60-40" aria-label="Оторвать контакт и скопировать номер"><span>Абебе +251 91 000-60-40</span></button>
+          <button type="button" class="tab" data-contact="Абебе · +251 91 000-60-40" aria-label="Оторвать контакт и скопировать номер"><span>Абебе +251 91 000-60-40</span></button>
+          <button type="button" class="tab" data-contact="Абебе · +251 91 000-60-40" aria-label="Оторвать контакт и скопировать номер"><span>Абебе +251 91 000-60-40</span></button>
+          <button type="button" class="tab" data-contact="Абебе · +251 91 000-60-40" aria-label="Оторвать контакт и скопировать номер"><span>Абебе +251 91 000-60-40</span></button>
+          <button type="button" class="tab" data-contact="Абебе · +251 91 000-60-40" aria-label="Оторвать контакт и скопировать номер"><span>Абебе +25......
+        </div>
+        <p class="tabs-note" id="tabsNote">Осталось контактов: <b>8</b> из 8</p>
+        <div class="poster-tools"><button type="button" class="link-btn" id="restoreTabs" hidden>Приклеить контакты обратно</button></div>
+      </article>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="/">На витрину</a>
+        <a class="btn btn-outline" href="/login" id="navLogin">Войти</a>
+        <a class="btn btn-outline" href="/profile" id="navProfile" hidden>Профиль</a>
+        <button type="button" class="btn btn-ghost" id="backBtn">← Назад</button>
+        <button type="button" class="btn btn-ghost" id="copyBtn">⧉ Скопировать адрес пропажи</button>
+        <button type="button" class="btn btn-ghost" id="printBtn">🖨 Распечатать листок</button>
+        <button type="button" class="btn btn-ghost" id="downloadBtn">↓ Скачать листок</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="next" id="next">
+    <div class="next-inner">
+      <p class="eyebrow reveal">куда пойти дальше</p>
+      <h2 class="reveal" style="--d:.06s">Свежие направления вместо остывшей страницы</h2>
+      <div class="nav-cards">
+        <a class="nav-card reveal" style="--d:.1s" href="/">
+          <span class="go">→</span>
+          <span class="ico"><svg viewBox="0 0 154 120" style="--cupc:#F0C987;--steam:rgba(240,201,135,.8);--saucer:rgba(0,0,0,.25)"><use href="#cup"/></svg></span>
+          <h3>Витрина кофе</h3>
+          <p>Классика, молочные и авторские напитки — с поиском, фильтром и ценами.</p>
+        </a>
+        <a class="nav-card reveal" style="--d:.16s" href="/login" id="cardLogin">
+          <span class="go">→</span>
+          <span class="ico"><svg viewBox="0 0 24 24" style="color:#F0C987"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <h3>Вход в клуб</h3>
+          <p>Вернуться за стойку: карта узнает вас по номеру, сессия — пять минут.</p>
+        </a>
+        <a class="nav-card reveal" style="--d:.22s" href="/register" id="cardRegister">
+          <span class="go">→</span>
+          <span class="ico"><svg viewBox="0 0 40 56" style="color:#E8933A"><use href="#bean"/></svg></span>
+          <h3>Регистрация</h3>
+          <p>Завести карту кофейного клуба и получить роль «читатель» за минуту.</p>
+        </a>
+        <a class="nav-card reveal" style="--d:.16s" href="/profile" id="cardProfile" hidden>
+          <span class="go">→</span>
+          <span class="ico"><svg viewBox="0 0 24 24" style="color:#F0C987"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <h3>Личный профиль</h3>
+          <p>Ваша роль, аватар и права доступа — всё, что положено гостю клуба.</p>
+        </a>
+        <a class="nav-card reveal" style="--d:.22s" href="/edit" id="cardAdmin" hidden>
+          <span class="go">→</span>
+          <span class="ico"><svg viewBox="0 0 24 24" style="color:#E8933A"><path d="M4 20h4L19 9l-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13 7l4 4" stroke="currentColor" stroke-width="2"/></svg></span>
+          <h3>Управление витриной</h3>
+          <p>Админская стойка: добавлять, менять и убирать напитки из меню.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">Coffee House · учебный проект на FastAPI · все действия пишутся в logs · сессия 5 минут</footer>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="application/json" id="server-state">{"mode":"server","code":{{ code|default(404) }},"message":{{ message|default(None)|tojson }},"user":{{ user|default(None)|tojson }},"path":{{ request.url.path|default('/')|tojson }}}</script>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let server = null;
+try { server = JSON.parse($('#server-state').textContent); } catch (e) { server = null; }
+const SERVER = !!(server && server.mode === 'server');
+const code = SERVER && Number(server.code) ? Number(server.code) : 404;
+const path = SERVER ? (server.path || '/') : (location.protocol === 'file:' ? '/coffee/secret-menu' : decodeURIComponent(location.pathname));
+const user = SERVER && server.user ? server.user : null;
+
+const COPY = {
+  400:{ eyebrow:'заказ не разобрали', title:'Бариста не понял заказ', status:'неверный запрос', def:'Запрос пришёл с чем-то, что меню не переваривает. Проверьте адрес и попробуйте снова.' },
+  403:{ eyebrow:'доступ запрещён', title:'Этот напиток только для админов', status:'доступ закрыт', def:'Роль «читатель» не пускает за админскую стойку. Витрина и профиль — всегда пожалуйста.' },
+  404:{ eyebrow:'розыск ведётся', title:'Кажется, Абебе потерял мешок кофе', status:'не найден', def:'Фермер из Эфиопии обошёл всю плантацию: мешок арабики исчез вместе с этой страницей. Остались только зёрна да следы — поможем найти хотя бы мешок.' },
+  500:{ eyebrow:'кофемашина заискрила', title:'На нашей стороне что-то закипело', status:'ошибка кухни', def:'Сервер сварил что-то не то. Мы уже протираем стойку — попробуйте зайти чуть позже.' }
+};
+const c = COPY[code] || { eyebrow:'что-то не по рецепту', title:'Страница ушла за добавкой', status:'неизвестный статус', def:'Что-то пошло не так. Вернитесь на витрину — там точно свежий кофе.' };
+const message = SERVER && server.message ? String(server.message) : c.def;
+
+document.title = `${code} · пропал без вести · Coffee House`;
+$('#eyebrow').textContent = c.eyebrow;
+$('#title').textContent = c.title;
+$('#message').textContent = message;
+$('#codeBig').textContent = code;
+$('#pCase').textContent = String(code).padStart(4, '0');
+$('#pPath').textContent = path;
+$('#pStatus').textContent = c.status;
+
+if (user && user.login) {
+  $('#who').hidden = false;
+  $('#whoName').textContent = user.login;
+  $('#whoInitial').textContent = user.login[0].toUpperCase();
+  $('#navLoginTop').hidden = true; $('#navRegisterTop').hidden = true; $('#navProfileTop').hidden = false;
+  $('#navLogin').hidden = true; $('#navProfile').hidden = false;
+  $('#cardLogin').hidden = true; $('#cardRegister').hidden = true; $('#cardProfile').hidden = false;
+  if (user.role === 'admin') $('#cardAdmin').hidden = false;
+}
+
+let toastTimer = null;
+const toast = text => {
+  const el = $('#toast'); el.textContent = text; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+};
+
+const copyText = async text => {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (err) {}
+    ta.remove(); return ok;
+  }
+};
+
+/* время розыска */
+const lostAt = new Date();
+$('#pDate').textContent = lostAt.toLocaleString('ru-RU', { day:'2-digit', month:'long', hour:'2-digit', minute:'2-digit' });
+let searchClock = null, frozen = null;
+const mmss = ms => {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+};
+const startClock = () => {
+  clearInterval(searchClock);
+  frozen = null;
+  $('#pTimer').textContent = '00:00';
+  searchClock = setInterval(() => { $('#pTimer').textContent = mmss(Date.now() - lostAt.getTime()); }, 1000);
+};
+startClock();
+
+const burst = n => {
+  if (reduce) return;
+  const box = $('#confetti'), colors = ['#E8933A','#F5B544','#C93A2E','#6F9A4E','#8F5A30','#F0C987'];
+  for (let i = 0; i < n; i++) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 40 56');
+    const u = document.createElementNS('http://www.w3.org/2000/svg','use'); u.setAttribute('href','#bean'); s.appendChild(u);
+    s.style.setProperty('--cx',(5 + Math.random()*90)+'vw');
+    s.style.setProperty('--cw',(12 + Math.random()*16)+'px');
+    s.style.setProperty('--cc',colors[i % colors.length]);
+    s.style.setProperty('--cd',(2.1 + Math.random()*1.6)+'s');
+    s.style.setProperty('--cr',(360 + Math.random()*720)+'deg');
+    s.style.animationDelay = (Math.random()*.3)+'s';
+    s.addEventListener('animationend', () => s.remove());
+    box.appendChild(s); setTimeout(() => s.remove(), 5000);
+  }
+};
+
+/* поиск мешка: сцена и листок розыска меняют состояние вместе */
+const scene = $('#scene'), findBtn = $('#findBtn'), note = $('#sceneNote'), poster = $('#poster'), stamp = $('#stamp');
+let found = false, searchTimer = null;
+findBtn.addEventListener('click', () => {
+  if (!found) {
+    scene.classList.add('searching');
+    findBtn.disabled = true;
+    findBtn.textContent = '🔍 Ищем мешок по следам…';
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      scene.classList.remove('searching');
+      scene.classList.add('found');
+      poster.classList.add('found');
+      found = true;
+      frozen = mmss(Date.now() - lostAt.getTime());
+      clearInterval(searchClock); searchClock = null;
+      $('#pTimer').textContent = frozen;
+      $('#pStatus').textContent = 'найден за кустом';
+      stamp.textContent = 'найден';
+      findBtn.disabled = false;
+      findBtn.textContent = '↺ Спрятать мешок снова';
+      note.textContent = 'мешок найден!';
+      burst(16);
+      toast(`Мешок найден за ${frozen}! Страницу, увы, не вернуть.`);
+    }, reduce ? 100 : 1750);
+  } else {
+    clearTimeout(searchTimer);
+    scene.classList.remove('found', 'searching');
+    poster.classList.remove('found');
+    found = false;
+    stamp.textContent = 'поиск идёт';
+    $('#pStatus').textContent = c.status;
+    startClock();
+    findBtn.disabled = false;
+    findBtn.textContent = '🔍 Помочь Абебе найти мешок';
+    note.textContent = 'ой, где же мешок…';
+    toast('Мешок снова пропал. Розыск возобновлён.');
+  }
+});
+
+/* отрывные контакты */
+const tabs = $$('#tabs .tab'), tabsNote = $('#tabsNote'), restoreBtn = $('#restoreTabs');
+const paintTabs = () => {
+  const left = tabs.filter(t => !t.classList.contains('torn')).length;
+  tabsNote.innerHTML = left
+    ? `Осталось контактов: <b>${left}</b> из ${tabs.length}`
+    : 'Все контакты разобрали — звоните Абебе лично ☎';
+  restoreBtn.hidden = left === tabs.length;
+};
+tabs.forEach(tab => tab.addEventListener('click', async () => {
+  if (tab.classList.contains('torn')) return;
+  tab.classList.add('torn');
+  setTimeout(() => { tab.hidden = true; }, reduce ? 0 : 480);
+  paintTabs();
+  const ok = await copyText(tab.dataset.contact);
+  toast(ok ? 'Контакт оторван и скопирован: ' + tab.dataset.contact : 'Контакт оторван: ' + tab.dataset.contact);
+}));
+restoreBtn.addEventListener('click', () => {
+  tabs.forEach(t => { t.hidden = false; t.classList.remove('torn'); });
+  paintTabs();
+  toast('Контакты приклеены обратно');
+});
+paintTabs();
+
+$('#backBtn').addEventListener('click', () => {
+  if (history.length > 1) history.back();
+  else location.href = '/';
+});
+$('#copyBtn').addEventListener('click', async () => {
+  const ok = await copyText(path);
+  toast(ok ? 'Адрес пропажи скопирован: ' + path : 'Адрес пропажи: ' + path);
+});
+$('#printBtn').addEventListener('click', () => { toast('Отправляем листок на печать…'); setTimeout(() => window.print(), 220); });
+
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[ch]));
+$('#downloadBtn').addEventListener('click', () => {
+  const acc = '#E8933A', ink = '#2B1A10', mut = '#7A6555';
+  const shortPath = path.length > 30 ? path.slice(0, 29) + '…' : path;
+  const left = tabs.filter(t => !t.classList.contains('torn')).length;
+  const stampText = found ? 'НАЙДЕН' : 'ПОИСК ИДЁТ';
+  const stampColor = found ? '#3F6129' : '#A02C22';
+  const timerText = found ? (frozen || '00:00') : mmss(Date.now() - lostAt.getTime());
+  let tabsSvg = '';
+  for (let i = 0; i < left; i++) {
+    const x = 30 + i * 45;
+    tabsSvg += `<line x1="${x}" y1="640" x2="${x}" y2="720" stroke="#C9B79C" stroke-dasharray="3 3"/><text x="${x + 22}" y="716" font-family="monospace" font-size="9" fill="${ink}" transform="rotate(-90 ${x + 22} 716)">Абебе +251 91 000-60-40</text>`;
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="420" height="760" viewBox="0 0 420 760">
+<rect width="420" height="760" fill="#FFFCF4"/>
+<rect x="12" y="12" width="396" height="736" fill="none" stroke="${acc}" stroke-width="2"/>
+<text x="210" y="52" text-anchor="middle" font-family="monospace" font-size="10" letter-spacing="4" fill="${mut}">COFFEE HOUSE · ПЛАНТАЦИЯ СИДАМО</text>
+<text x="210" y="92" text-anchor="middle" font-family="Georgia,serif" font-size="32" font-weight="bold" fill="#A02C22">ПРОПАЛ БЕЗ ВЕСТИ</text>
+<text x="210" y="116" text-anchor="middle" font-family="monospace" font-size="11" letter-spacing="2" fill="${mut}">МЕШОК КОФЕ · ДЕЛО № ${String(code).padStart(4,'0')}</text>
+<line x1="30" y1="130" x2="390" y2="130" stroke="${ink}" stroke-width="2"/>
+<rect x="120" y="146" width="180" height="180" fill="#EFE4D2" stroke="${ink}" stroke-width="2"/>
+<g stroke="rgba(43,26,16,.18)"><line x1="120" y1="182" x2="300" y2="182"/><line x1="120" y1="218" x2="300" y2="218"/><line x1="120" y1="254" x2="300" y2="254"/><line x1="120" y1="290" x2="300" y2="290"/></g>
+<g transform="translate(150 168) scale(1)">
+<path d="M28 44 q -6 -16 9 -21 q 5 -11 23 -11 q 18 0 23 11 q 15 5 9 21 q 9 40 -6 62 q -26 12 -52 0 q -15 -22 -6 -62 z" fill="#C98A4B" stroke="#5A3A22" stroke-width="3"/>
+<path d="M43 22 q 17 10 34 0" stroke="#5A3A22" stroke-width="5" fill="none"/>
+<path d="M50 16 q 10 -11 20 0" stroke="#3B2416" stroke-width="6" fill="none"/>
+<text x="60" y="82" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="15" font-weight="bold" fill="#3B2416">COFFEE</text>
+<ellipse cx="60" cy="102" rx="8" ry="11" fill="#3B2416"/>
+</g>
+<text x="210" y="356" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="${ink}">«Арабика № 60»</text>
+<g font-family="monospace" font-size="12" fill="${ink}">
+<text x="30" y="392">Пропал:</text><text x="390" y="392" text-anchor="end">${esc(lostAt.toLocaleString('ru-RU'))}</text>
+<text x="30" y="418">Время розыска:</text><text x="390" y="418" text-anchor="end">${esc(timerText)}</text>
+<text x="30" y="444">Последний раз видели:</text><text x="390" y="444" text-anchor="end">у куста, третий ряд</text>
+<text x="30" y="470">Вес / рост:</text><text x="390" y="470" text-anchor="end">60 кг · 90 см</text>
+<text x="30" y="496">Пропал вместе с:</text><text x="390" y="496" text-anchor="end">${esc(shortPath)}</text>
+<text x="30" y="522">Статус:</text><text x="390" y="522" text-anchor="end">${esc(found ? 'найден за кустом' : c.status)}</text>
+</g>
+<text x="30" y="556" font-family="Helvetica,Arial,sans-serif" font-size="10" letter-spacing="2" fill="${mut}">ОСОБЫЕ ПРИМЕТЫ</text>
+<text x="30" y="576" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="${ink}">Джут цвета карамели, штамп COFFEE, двойной узел.</text>
+<text x="30" y="594" font-family="Helvetica,Arial,sans-serif" font-size="11.5" fill="${ink}">Пахнет шоколадом и цитрусом. Не пугать при встрече.</text>
+<rect x="30" y="606" width="360" height="34" fill="none" stroke="${acc}" stroke-width="2"/>
+<text x="210" y="629" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="${ink}">Награда: капучино и круассан</text>
+${tabsSvg}
+<g transform="rotate(-14 320 200)"><rect x="248" y="176" width="150" height="44" fill="none" stroke="${stampColor}" stroke-width="3"/><text x="323" y="205" text-anchor="middle" font-family="Georgia,serif" font-size="19" font-weight="bold" letter-spacing="2" fill="${stampColor}">${stampText}</text></g>
+<text x="210" y="742" text-anchor="middle" font-family="monospace" font-size="9" letter-spacing="3" fill="${mut}">СВИДЕТЕЛЬ: АБЕБЕ, ФЕРМЕР · COFFEE HOUSE</text>
+</svg>`;
+  const url = URL.createObjectURL(new Blob([svg], { type:'image/svg+xml;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = `coffee-missing-${code}.svg`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  toast('Листок розыска сохранён как SVG');
+});
+
+const topbar = $('#topbar');
+const onScroll = () => topbar.classList.toggle('scrolled', window.scrollY > 6);
+window.addEventListener('scroll', onScroll, { passive:true }); onScroll();
+
+const beans = $('#beans');
+if (beans && !reduce && window.matchMedia('(hover:hover)').matches) {
+  let pending = false;
+  $('.stage').addEventListener('pointermove', e => {
+    if (pending) return; pending = true;
+    requestAnimationFrame(() => {
+      const r = e.currentTarget.getBoundingClientRect();
+      const dx = (e.clientX - r.left)/r.width - .5, dy = (e.clientY - r.top)/r.height - .5;
+      beans.style.transform = `translate(${(-dx*22).toFixed(1)}px, ${(-dy*16).toFixed(1)}px)`;
+      pending = false;
+    });
+  });
+}
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { threshold:.1, rootMargin:'0px 0px -40px 0px' }) : null;
+$$('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+})();
+</script>
 </body>
 </html>

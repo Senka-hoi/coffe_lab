@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Управление витриной{% endblock %}
+{% block content %}
+{% set items = items|default([]) %}
+{% set item = item|default(None) %}
+<section class="section">
+  <div class="section-head reveal">
+    <p class="eyebrow">админ-панель</p>
+    <h1>{{ 'Редактирование напитка' if item else 'Управление витриной' }}</h1>
+    <p class="muted">Изменения сразу попадают в data.csv и на главную страницу. <a href="/">← На витрину</a></p>
+  </div>
+
+  <div class="edit-grid">
+    <form class="form-card reveal" method="post" action="{{ '/edit/' ~ item.id if item else '/edit/add' }}" id="itemForm">
+      <h2>{{ 'Редактировать: ' ~ item.name if item else 'Новый напиток' }}</h2>
+      <label class="field">
+        <span>Название</span>
+        <input name="name" id="fName" required maxlength="60" value="{{ item.name if item else '' }}" placeholder="Раф солёная карамель">
+      </label>
+      <label class="field">
+        <span>Категория</span>
+        <input name="category" id="fCategory" required list="catList" maxlength="30" value="{{ item.category if item else '' }}" placeholder="Авторские">
+        <datalist id="catList">
+          {% for c in items|map(attribute='category')|unique %}<option value="{{ c }}">{% endfor %}
+        </datalist>
+      </label>
+      <label class="field">
+        <span>Описание <i class="counter" id="descCounter">0 / 220</i></span>
+        <textarea name="description" id="fDesc" maxlength="220" rows="4" placeholder="Сливки, карамель и щепотка соли…">{{ item.description if item else '' }}</textarea>
+      </label>
+      <label class="field">
+        <span>Цена, ₽</span>
+        <input name="price" id="fPrice" required inputmode="decimal" value="{{ item.price if item else '' }}" placeholder="290">
+      </label>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{{ 'Сохранить изменения' if item else 'Добавить на витрину' }}</button>
+        {% if item %}<a class="btn btn-ghost" href="/edit">Отмена</a>{% endif %}
+      </div>
+    </form>
+
+    <div class="preview-col reveal" style="--d:.12s">
+      <p class="eyebrow">живой предпросмотр</p>
+      <article class="card preview-card" style="--cup:#e8933a">
+        <div class="card-art"><svg class="cup-art" viewBox="0 0 154 120"><use href="#cup"/></svg></div>
+        <div class="card-body">
+          <span class="tag" id="pvCat">Категория</span>
+          <h3 id="pvName">Название напитка</h3>
+          <p class="desc" id="pvDesc">Описание появится здесь, пока вы печатаете…</p>
+          <div class="card-foot"><span class="price" id="pvPrice">0 ₽</span><span class="more">Предпросмотр</span></div>
+        </div>
+      </article>
+      <p class="hint">Карточка обновляется на лету — именно так напиток будет выглядеть на витрине.</p>
+    </div>
+  </div>
+
+  <div class="table-card reveal">
+    <div class="table-head"><h2>Позиции на витрине</h2><span class="badge admin">{{ items|length }}</span></div>
+    {% if items %}
+    <div class="table-scroll">
+      <table class="items">
+        <thead><tr><th>ID</th><th>Название</th><th>Категория</th><th>Цена</th><th class="ta-r">Действия</th></tr></thead>
+        <tbody>
+        {% for it in items %}
+          <tr>
+            <td class="mono muted">#{{ it.id }}</td>
+            <td><b>{{ it.name }}</b><div class="td-desc">{{ it.description }}</div></td>
+            <td><span class="tag">{{ it.category }}</span></td>
+            <td class="price-sm">{{ it.price }} ₽</td>
+            <td class="ta-r">
+              <a class="btn btn-outline btn-sm" href="/edit/{{ it.id }}">Изменить</a>
+              <form class="inline" method="post" action="/delete/{{ it.id }}" data-confirm="Удалить «{{ it.name }}»? Действие попадёт в логи.">
+                <button class="btn btn-danger btn-sm" type="submit">Удалить</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="muted pad">Пока пусто — добавьте первый напиток формой выше.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

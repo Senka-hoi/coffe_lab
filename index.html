@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Витрина кофе{% endblock %}
+{% block content %}
+{% set user = user|default(None) %}
+{% set items = items|default([]) %}
+{% set categories = categories|default([]) %}
+{% set palette = ['#e8933a', '#c96f4a', '#d9a05b', '#8f5a30', '#b3402e', '#6f9a4e'] %}
+{% set n = palette|length %}
+
+<section class="hero" id="top">
+  <div class="hero-beans" aria-hidden="true">
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:5%;--y:16%;--r:-24deg;--s:1.2;--fd:0s"><use href="#bean"/></svg>
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:14%;--y:64%;--r:38deg;--s:.8;--fd:1.2s;--bc:rgba(240,201,135,.35)"><use href="#bean"/></svg>
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:46%;--y:10%;--r:12deg;--s:.7;--fd:.6s;--bc:rgba(201,58,46,.4)"><use href="#bean"/></svg>
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:58%;--y:72%;--r:-40deg;--s:1;--fd:1.8s"><use href="#bean"/></svg>
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:88%;--y:22%;--r:24deg;--s:1.3;--fd:.3s;--bc:rgba(240,201,135,.4)"><use href="#bean"/></svg>
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:78%;--y:58%;--r:-12deg;--s:.75;--fd:2.2s;--bc:rgba(111,154,78,.4)"><use href="#bean"/></svg>
+  </div>
+
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow reveal">кофейная витрина · fresh roast</p>
+      <h1 class="reveal" style="--d:.08s">Очень <em>вкусный</em> кофе — выбирайте свой</h1>
+      <p class="lead reveal" style="--d:.16s">Разновидности и вариации на одной странице: классика, молочные и авторские напитки. Фильтруйте по категории, ищите по названию и читайте описания.</p>
+      <div class="hero-actions reveal" style="--d:.24s">
+        <a class="btn btn-primary btn-lg" href="#catalog">Смотреть витрину</a>
+        {% if user and user.role == 'admin' %}<a class="btn btn-outline btn-lg" href="/edit">+ Добавить кофе</a>{% endif %}
+      </div>
+      <dl class="hero-stats reveal" style="--d:.32s">
+        <div><dt>{{ items|length }}</dt><dd>позиций в меню</dd></div>
+        <div><dt>{{ categories|length }}</dt><dd>категорий</dd></div>
+        <div><dt>5 мин</dt><dd>сессия бездействия</dd></div>
+      </dl>
+    </div>
+    <div class="hero-art reveal" style="--d:.2s">
+      <div class="hero-cup-wrap">
+        <svg class="hero-cup" viewBox="0 0 154 120" style="--cup:#e8933a;--coffee:#241209;--crema:#c98a4b;--steam:rgba(255,240,220,.85);--saucer:rgba(0,0,0,.35)"><use href="#cup"/></svg>
+        <span class="hand-note light">раф сегодня особенно хорош ☕</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      {% set words = ['ЭСПРЕССО','АМЕРИКАНО','КАПУЧИНО','ЛАТТЕ','РАФ','ФЛЭТ УАЙТ','КОЛД БРЮ','МОККА'] %}
+      {% for _ in [1, 2] %}{% for w in words %}<span>{{ w }}<i>✦</i></span>{% endfor %}{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="catalog section" id="catalog">
+  <header class="section-head reveal">
+    <p class="eyebrow">меню</p>
+    <h2>Витрина кофе</h2>
+    <p class="muted">Нажмите на карточку, чтобы рассмотреть напиток поближе.</p>
+  </header>
+
+  {% if items %}
+  <div class="toolbar reveal">
+    <div class="chips" id="chips" role="group" aria-label="Фильтр по категории">
+      <button class="chip active" type="button" data-cat="">Все</button>
+      {% for c in categories %}<button class="chip" type="button" data-cat="{{ c }}">{{ c }}</button>{% endfor %}
+    </div>
+    <div class="tools">
+      <label class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="searchInput" type="search" placeholder="Поиск: латте, раф…" autocomplete="off" aria-label="Поиск по витрине">
+      </label>
+      <select id="sortSelect" class="select" aria-label="Сортировка">
+        <option value="default">По порядку</option>
+        <option value="price-asc">Цена: сначала дешевле</option>
+        <option value="price-desc">Цена: сначала дороже</option>
+        <option value="name">Название: А–Я</option>
+      </select>
+    </div>
+  </div>
+  <p class="count muted" id="countLine" aria-live="polite"></p>
+
+  <div class="cards" id="cards">
+    {% for item in items %}
+    {% set ci = categories.index(item.category) if item.category in categories else loop.index0 %}
+    <article class="card reveal" style="--d:{{ '%.2f'|format((loop.index0 % 8) * 0.05) }}s; --cup:{{ palette[ci % n] }}"
+      data-id="{{ item.id }}" data-name="{{ item.name }}" data-category="{{ item.category }}"
+      data-price="{{ item.price }}" data-desc="{{ item.description }}"
+      tabindex="0" role="button" aria-label="Подробнее: {{ item.name }}">
+      <div class="card-art"><svg class="cup-art" viewBox="0 0 154 120"><use href="#cup"/></svg></div>
+      <div class="card-body">
+        <span class="tag">{{ item.category }}</span>
+        <h3>{{ item.name }}</h3>
+        <p class="desc">{{ item.description }}</p>
+        <div class="card-foot">
+          <span class="price">{{ item.price }} ₽</span>
+          <span class="more">Подробнее →</span>
+        </div>
+      </div>
+      {% if user and user.role == 'admin' %}
+      <div class="card-admin">
+        <a class="icon-btn" href="/edit/{{ item.id }}" title="Редактировать" data-stop>✎</a>
+        <form method="post" action="/delete/{{ item.id }}" data-confirm="Удалить «{{ item.name }}» из витрины?" data-stop>
+          <button class="icon-btn danger" title="Удалить" type="submit">🗑</button>
+        </form>
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="empty" id="noResults" hidden>
+    <svg class="empty-cup" viewBox="0 0 154 120"><use href="#cup"/></svg>
+    <h3>Ничего не нашлось</h3>
+    <p class="muted">Попробуйте другой запрос или сбросьте фильтры.</p>
+    <button class="btn btn-outline" id="resetFilters" type="button">Сбросить фильтры</button>
+  </div>
+
+  <div class="modal" id="detailModal" hidden>
+    <div class="scrim" data-close></div>
+    <div class="dialog detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <button class="dialog-x" type="button" data-close aria-label="Закрыть">✕</button>
+      <div class="detail-art"><svg class="cup-art big" id="detailCup" viewBox="0 0 154 120"><use href="#cup"/></svg></div>
+      <span class="tag" id="detailCat"></span>
+      <h3 id="detailTitle"></h3>
+      <p class="desc full" id="detailDesc"></p>
+      <div class="detail-foot">
+        <span class="price" id="detailPrice"></span>
+        {% if user and user.role == 'admin' %}<a class="btn btn-outline btn-sm" id="detailEdit" href="#">Редактировать</a>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty reveal">
+    <svg class="empty-cup" viewBox="0 0 154 120"><use href="#cup"/></svg>
+    <h3>Витрина пока пуста</h3>
+    <p class="muted">Админ уже варит первую партию.{% if user and user.role == 'admin' %} Добавьте первый напиток!{% endif %}</p>
+    {% if user and user.role == 'admin' %}<a class="btn btn-primary" href="/edit">+ Добавить кофе</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+
+<section class="section-dark" id="about">
+  <div class="section-head reveal">
+    <p class="eyebrow light">путь зерна</p>
+    <h2>От зерна до чашки</h2>
+  </div>
+  <div class="steps">
+    <div class="step reveal" style="--d:0s">
+      <span class="step-num hand-note light">шаг 01</span>
+      <span class="step-ico"><svg viewBox="0 0 40 56" style="color:#e8933a"><use href="#bean"/></svg></span>
+      <h3>Зерно</h3>
+      <p>Отбираем арабику и робусту свежей урожайности: плотное зерно, честный вкус, никаких компромиссов.</p>
+    </div>
+    <div class="step reveal" style="--d:.1s">
+      <span class="step-num hand-note light">шаг 02</span>
+      <span class="step-ico"><svg viewBox="0 0 24 24" style="color:#c93a2e"><path d="M12 2c1 4-4 6-4 11a4 4 0 0 0 8 0c0-2-1-3-1-3s3 1 3 5a6 6 0 0 1-12 0C6 8 12 7 12 2z" fill="currentColor"/></svg></span>
+      <h3>Обжарка</h3>
+      <p>Малые партии каждую неделю. Светлая — для фильтра, тёмная — для эспрессо-классики с плотной крема.</p>
+    </div>
+    <div class="step reveal" style="--d:.2s">
+      <span class="step-num hand-note light">шаг 03</span>
+      <span class="step-ico"><svg viewBox="0 0 154 120" style="--cup:#f0c987;--coffee:#241209;--steam:rgba(240,201,135,.8)"><use href="#cup"/></svg></span>
+      <h3>Чашка</h3>
+      <p>Бариста настраивает помол под каждый напиток, чтобы витрина была не просто красивой, а вкусной.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

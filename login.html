@@ -1,0 +1,697 @@
+<!doctype html>
+<!-- Coffee House · Вход. Самостоятельный файл и Jinja2-шаблон для FastAPI (POST /login: login, password). -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход · Coffee House</title>
+<meta name="description" content="Вход в кофейный клуб Coffee House: витрина кофе, личный профиль и сессия на 5 минут.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,700&family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --espresso:#1E0F07;--roast:#3B2416;--bean:#5A3A22;
+  --cherry:#C93A2E;--leaf:#6F9A4E;--coldbrew:#3E6B92;--amber:#F5B544;--crema:#F0C987;
+  --accent:#E8933A;--accent-2:#F5B544;--on-accent:#1E0F07;--accent-dark:#A05A18;--glow:232,147,58;
+  --bg:#F6EFE4;--surface:#FFFAF1;--surface-2:#EFE4D2;--overlay:#FFFCF6;
+  --text:#2B1A10;--muted:#7A6555;--line:#E2D3BD;--line-strong:#CDB795;
+  --field:#FFFFFF;--field-text:#2B1A10;--placeholder:#9C8770;--accent-text:#A05A18;
+  --ok-text:#3F6129;--bad-text:#A02C22;--warn-text:#8A5D0C;--info-text:#2F5A7D;
+  --shadow:0 22px 50px -26px rgba(43,26,16,.55);
+  --nav-h:68px;--r-lg:24px;--r-md:16px;--r-sm:11px;
+  --display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hand:"Caveat","Segoe Script",cursive;--ease:cubic-bezier(.2,.7,.3,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-color:var(--accent) var(--surface-2);scrollbar-width:thin}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.55;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+button,input{font:inherit;color:inherit}
+a{color:var(--accent-text)}
+::selection{background:var(--accent);color:var(--on-accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+[hidden]{display:none!important}
+::-webkit-scrollbar{width:13px;height:13px}
+::-webkit-scrollbar-track{background:var(--surface-2)}
+::-webkit-scrollbar-thumb{border-radius:9px;border:3px solid var(--surface-2);background:linear-gradient(var(--accent),var(--bean))}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(var(--accent-2),var(--accent))}
+.grain{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.06;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)'/%3E%3C/svg%3E")}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.aurora i{position:absolute;border-radius:50%;filter:blur(95px)}
+.aurora .a1{width:48vw;height:48vw;top:-14%;right:-10%;background:radial-gradient(circle,rgba(var(--glow),.42),transparent 70%);animation:drift 27s ease-in-out infinite alternate}
+.aurora .a2{width:40vw;height:40vw;bottom:-16%;left:-8%;background:radial-gradient(circle,rgba(201,58,46,.22),transparent 70%);animation:drift 34s ease-in-out infinite alternate-reverse}
+.aurora .a3{width:32vw;height:32vw;top:44%;left:38%;background:radial-gradient(circle,rgba(111,154,78,.18),transparent 70%);animation:drift 41s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(7%,-6%) scale(1.12)}}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:50;display:flex;align-items:center;gap:14px;padding:0 clamp(14px,3.4vw,34px);background:linear-gradient(110deg,rgba(30,15,7,.94),rgba(59,36,22,.94) 58%,rgba(90,58,34,.94));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(var(--glow),.4);transition:box-shadow .3s}
+.topbar.scrolled{box-shadow:0 16px 34px -18px rgba(10,5,2,.85)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#F6EFE4;font-family:var(--display);font-size:20px;font-weight:800}
+.brand svg{width:34px;height:auto;aspect-ratio:154/120}
+.brand em{color:var(--crema);font-style:italic}
+.top-nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+.top-nav a{color:#E9DCC8;text-decoration:none;font-size:14px;font-weight:700;padding:9px 15px;border-radius:999px;transition:.2s}
+.top-nav a:hover{background:rgba(255,255,255,.1);color:#FFF6EC}
+.top-nav a.current{background:rgba(var(--glow),.24);color:#FFF6EC;box-shadow:inset 0 0 0 1px rgba(var(--glow),.6)}
+.top-nav .cta{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent)}
+.top-nav .cta:hover{filter:brightness(1.08)}
+.who{display:flex;align-items:center;gap:8px;color:#F6EFE4;font-size:13px;font-weight:700;padding-left:6px}
+.who i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent)}
+.shell{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);padding-top:var(--nav-h);min-height:100vh}
+.roastery{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow:hidden;color:#F6EFE4;display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,4vw,56px);background:radial-gradient(720px 460px at 18% 4%,rgba(var(--glow),.34),transparent 62%),radial-gradient(620px 420px at 92% 96%,rgba(201,58,46,.26),transparent 64%),linear-gradient(158deg,#170B04 0%,#3B2416 52%,#5A3A22 88%,#6E4A2A 100%)}
+.roastery::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 120%,rgba(10,5,2,.6),transparent 60%)}
+.roast-inner{position:relative;z-index:2;max-width:520px}
+.roast-eyebrow{margin:0;text-transform:uppercase;letter-spacing:.26em;font-size:11px;font-weight:800;color:var(--crema)}
+.roastery h2{font-family:var(--display);font-weight:800;font-size:clamp(30px,3.4vw,46px);line-height:1.08;margin:14px 0 12px}
+.roastery h2 em{font-style:italic;background:linear-gradient(92deg,var(--amber),var(--accent),#FF8A5C);-webkit-background-clip:text;background-clip:text;color:transparent}
+.roast-copy{color:#DCCBB5;font-size:15.5px;max-width:44ch;margin:0 0 22px}
+.cup-stage{position:relative;width:min(330px,74%);margin:6px 0 20px}
+.cup-stage svg{width:100%;height:auto;aspect-ratio:154/120;filter:drop-shadow(0 34px 44px rgba(0,0,0,.55));animation:bob 7s ease-in-out infinite}
+.cup-note{position:absolute;right:-14px;bottom:2px;font-family:var(--hand);font-size:23px;color:var(--crema);transform:rotate(-5deg)}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-11px) rotate(-1.4deg)}}
+.roast-stats{display:flex;gap:30px;flex-wrap:wrap;margin:0;padding:18px 0 0;border-top:1px solid rgba(var(--glow),.32)}
+.roast-stats div{min-width:82px}
+.roast-stats dt{font-family:var(--display);font-size:27px;color:var(--amber)}
+.roast-stats dd{margin:2px 0 0;font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:#B9A48C}
+.roast-quote{font-family:var(--hand);font-size:25px;color:#F0C987;margin:22px 0 0;transform:rotate(-1.5deg)}
+.beans{position:absolute;inset:0;z-index:1;pointer-events:none;transition:transform .5s var(--ease)}
+.beans svg{position:absolute;left:var(--x);top:var(--y);width:calc(30px * var(--s,1));height:auto;aspect-ratio:40/56;color:var(--c,rgba(var(--glow),.5));transform:rotate(var(--r,0deg));animation:floaty 6.5s ease-in-out infinite alternate;animation-delay:var(--d,0s);filter:drop-shadow(0 10px 12px rgba(0,0,0,.35))}
+@keyframes floaty{from{transform:rotate(var(--r,0deg)) translateY(0)}to{transform:rotate(var(--r,0deg)) translateY(-16px)}}
+.marquee{position:absolute;left:0;right:0;bottom:0;z-index:2;overflow:hidden;padding:13px 0;background:rgba(12,6,2,.55);border-top:1px solid rgba(var(--glow),.3)}
+.marquee div{display:inline-flex;gap:42px;width:max-content;white-space:nowrap;animation:slide 30s linear infinite}
+.marquee span{font-family:var(--display);font-size:13px;letter-spacing:.32em;color:#F0C987}
+.marquee i{color:var(--accent);font-style:normal;margin-left:42px}
+@keyframes slide{to{transform:translateX(-50%)}}
+.enroll{padding:clamp(26px,3.4vw,52px) clamp(18px,3.4vw,52px) 60px;display:flex;justify-content:center}
+.enroll-inner{width:min(560px,100%)}
+.head-eyebrow{margin:0;text-transform:uppercase;letter-spacing:.24em;font-size:11px;font-weight:800;color:var(--accent-text)}
+.enroll h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,3.2vw,40px);line-height:1.12;margin:10px 0}
+.enroll .lead{color:var(--muted);font-size:15px;margin:0 0 22px;max-width:52ch}
+.demo-pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--info-text);background:color-mix(in srgb,var(--info-text) 12%,transparent);border:1px dashed color-mix(in srgb,var(--info-text) 45%,transparent);padding:7px 13px;border-radius:999px;margin-bottom:18px}
+.card-stage{perspective:1100px;margin-bottom:24px}
+.card-float{animation:hover 8s ease-in-out infinite}
+@keyframes hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.club-card{position:relative;border-radius:20px;padding:20px 22px 18px;color:#FFF6EC;overflow:hidden;min-height:212px;display:flex;flex-direction:column;gap:12px;transform-style:preserve-3d;background:linear-gradient(135deg,var(--accent),var(--espresso) 58%,var(--accent-2));box-shadow:0 26px 46px -24px rgba(20,10,5,.85),0 0 0 1px rgba(var(--glow),.55),inset 0 1px 0 rgba(255,255,255,.18)}
+.club-card::before{content:"";position:absolute;inset:0;background:linear-gradient(150deg,rgba(18,9,4,.42),rgba(18,9,4,.62));z-index:0}
+.card-sheen{position:absolute;inset:-30%;z-index:1;pointer-events:none;opacity:.75;background:radial-gradient(220px 220px at var(--mx,70%) var(--my,20%),rgba(255,255,255,.22),transparent 65%)}
+.card-noise{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23m)'/%3E%3C/svg%3E")}
+.club-card>*:not(.card-sheen):not(.card-noise){position:relative;z-index:2}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:15px}
+.card-brand svg{width:24px;height:auto;aspect-ratio:154/120}
+.card-tier{font-size:10px;font-weight:800;letter-spacing:.18em;padding:5px 11px;border-radius:999px;background:rgba(255,246,236,.16);border:1px solid rgba(255,246,236,.35)}
+.card-mid{display:flex;align-items:center;gap:14px;margin-top:2px}
+.card-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:24px;font-weight:800;color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 0 3px rgba(255,246,236,.28)}
+.card-label{display:block;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,246,236,.72)}
+.card-name{font-family:var(--display);font-size:24px;font-weight:800;word-break:break-all;line-height:1.15}
+.card-number{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15.5px;letter-spacing:.16em;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,246,236,.22);font-size:11px;color:rgba(255,246,236,.85)}
+.card-status{display:flex;align-items:center;gap:6px}
+.card-status i{width:9px;height:9px;border-radius:50%;background:#B9A48C;transition:background .3s}
+.card-barcode{width:88px;height:26px;border-radius:3px;opacity:.9;background:repeating-linear-gradient(90deg,#FFF6EC 0 2px,transparent 2px 4px,#FFF6EC 4px 5px,transparent 5px 9px,#FFF6EC 9px 12px,transparent 12px 14px)}
+.card-hint{margin:12px 2px 0;font-size:12.5px;color:var(--muted)}
+.alert{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border-radius:var(--r-sm);margin-bottom:18px;font-size:14px;font-weight:600;background:color-mix(in srgb,var(--bad-text) 12%,transparent);color:var(--bad-text);border:1px solid color-mix(in srgb,var(--bad-text) 42%,transparent);animation:shake .42s}
+.alert b{flex:none;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--bad-text);color:var(--surface)}
+@keyframes shake{0%,100%{transform:translateX(0)}22%{transform:translateX(-6px)}48%{transform:translateX(6px)}74%{transform:translateX(-3px)}}
+.enroll-form{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,30px);box-shadow:var(--shadow)}
+.field{margin-bottom:18px}
+.field>label{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:13px;font-weight:800;margin-bottom:7px}
+.counter{font-size:11px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.input-wrap{display:flex;align-items:center;gap:10px;padding:0 12px;background:var(--field);border:1px solid var(--line-strong);border-radius:var(--r-sm);transition:border-color .2s,box-shadow .2s}
+.input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(var(--glow),.22)}
+.input-wrap>svg{flex:none;width:18px;height:18px;color:var(--muted)}
+.input-wrap input{flex:1;min-width:0;border:0;background:transparent;padding:14px 0;font-size:16px;color:var(--field-text)}
+.input-wrap input:focus{outline:none}
+.input-wrap input::placeholder{color:var(--placeholder)}
+.field[data-state="bad"] .input-wrap{border-color:var(--bad-text);box-shadow:0 0 0 4px color-mix(in srgb,var(--bad-text) 18%,transparent)}
+.field[data-state="ok"] .input-wrap{border-color:color-mix(in srgb,var(--ok-text) 60%,var(--line-strong))}
+.eye{flex:none;width:36px;height:36px;border:0;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:.2s}
+.eye:hover{color:var(--accent-text);background:rgba(var(--glow),.14)}
+.eye svg{width:20px;height:20px}
+.eye .slash{opacity:0;transition:.2s}
+.eye.on .slash{opacity:1}
+.status{flex:none;font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.status.idle{display:none}
+.status.ok{color:var(--ok-text);background:color-mix(in srgb,var(--ok-text) 14%,transparent)}
+.status.bad{color:var(--bad-text);background:color-mix(in srgb,var(--bad-text) 14%,transparent)}
+.msg{margin:7px 2px 0;font-size:12.5px;color:var(--muted);min-height:18px}
+.field[data-state="bad"] .msg{color:var(--bad-text);font-weight:600}
+.field[data-state="ok"] .msg{color:var(--ok-text)}
+.caps{display:flex;align-items:center;gap:7px;color:var(--warn-text);font-weight:700}
+.quick-row{display:flex;flex-wrap:wrap;gap:9px;margin:4px 0 18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:1px solid transparent;cursor:pointer;font-weight:800;font-size:15px;padding:13px 24px;border-radius:999px;text-decoration:none;transition:transform .16s var(--ease),box-shadow .22s,filter .2s,background .2s,color .2s}
+.btn:active{transform:scale(.975)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--on-accent);box-shadow:0 12px 26px -12px rgba(var(--glow),.95)}
+.btn-primary:hover{transform:translateY(-2px);filter:brightness(1.07)}
+.btn-primary.ready{box-shadow:0 12px 30px -10px rgba(var(--glow),1),0 0 0 3px rgba(var(--glow),.22)}
+.btn-outline{border-color:color-mix(in srgb,var(--accent-text) 55%,transparent);color:var(--accent-text);background:transparent}
+.btn-outline:hover{background:rgba(var(--glow),.14);transform:translateY(-2px)}
+.btn-ghost{background:var(--surface-2);color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{background:color-mix(in srgb,var(--accent) 18%,var(--surface-2));transform:translateY(-2px)}
+.btn-sm{padding:9px 16px;font-size:13px}
+.btn-lg{padding:16px 30px;font-size:16px}
+.spinner{display:none;width:17px;height:17px;border-radius:50%;border:2px solid rgba(0,0,0,.28);border-top-color:currentColor;animation:spin .7s linear infinite}
+.btn.loading .spinner{display:block}
+.btn.loading{pointer-events:none;opacity:.9}
+@keyframes spin{to{transform:rotate(360deg)}}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;color:var(--muted);cursor:pointer;margin-top:4px}
+.consent input{position:absolute;opacity:0;width:0;height:0}
+.consent .box{flex:none;width:24px;height:24px;border-radius:8px;border:1.5px solid var(--line-strong);background:var(--field);display:grid;place-items:center;transition:.2s;margin-top:1px}
+.consent .box::after{content:"✓";font-size:14px;font-weight:800;color:var(--on-accent);opacity:0;transform:scale(.5);transition:.2s}
+.consent input:checked+.box{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+.consent input:checked+.box::after{opacity:1;transform:scale(1)}
+.consent input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:3px}
+.submit-row{display:flex;align-items:center;gap:16px;margin-top:20px;flex-wrap:wrap}
+.progress{display:flex;align-items:center;gap:10px;flex:none}
+.progress .ring{position:relative;width:52px;height:52px}
+.progress svg{width:52px;height:52px;transform:rotate(-90deg)}
+.progress .track{fill:none;stroke:var(--surface-2);stroke-width:6}
+.progress .bar{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .4s var(--ease)}
+.progress .pct{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;font-weight:800}
+.progress small{display:block;font-size:11px;color:var(--muted);max-width:78px;line-height:1.3}
+.submit-row .btn{flex:1;min-width:220px}
+.foot-links{margin:20px 2px 0;font-size:13.5px;color:var(--muted);text-align:center}
+.legal{margin:26px 2px 0;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6}
+.success{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(22px,2.6vw,34px);box-shadow:var(--shadow);text-align:center;animation:pop .45s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}}
+.stamp{display:inline-block;font-family:var(--display);font-size:13px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--ok-text);border:2px solid var(--ok-text);border-radius:10px;padding:8px 16px;transform:rotate(-7deg);animation:stamp .5s var(--ease) both;opacity:.92}
+.stamp.cold{color:var(--bad-text);border-color:var(--bad-text)}
+@keyframes stamp{0%{transform:rotate(-7deg) scale(2.4);opacity:0}60%{transform:rotate(-7deg) scale(.94);opacity:1}100%{transform:rotate(-7deg) scale(1)}}
+.success h2{font-family:var(--display);font-size:clamp(24px,2.8vw,32px);margin:18px 0 8px;line-height:1.2;word-break:break-word}
+.success p{color:var(--muted);font-size:14.5px;margin:0 auto 18px;max-width:46ch}
+.session-ring{position:relative;width:132px;height:132px;margin:0 auto 18px}
+.session-ring svg{width:132px;height:132px;transform:rotate(-90deg)}
+.session-ring .track{fill:none;stroke:var(--surface-2);stroke-width:9}
+.session-ring .bar{fill:none;stroke:var(--accent);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .5s linear,stroke .3s}
+.session-ring.warn .bar{stroke:var(--amber)}
+.session-ring.danger .bar{stroke:var(--cherry)}
+.session-ring .time{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
+.session-ring .cap{position:absolute;left:0;right:0;bottom:24px;text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.success-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 22px;text-align:left}
+.success-facts div{background:var(--overlay);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px}
+.success-facts dt{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.success-facts dd{margin:3px 0 0;font-weight:800;font-size:14px;word-break:break-all}
+.success-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.confetti{position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden}
+.confetti svg{position:absolute;top:-6vh;left:var(--cx);width:var(--cw,18px);height:auto;aspect-ratio:40/56;color:var(--cc);animation:fall var(--cd,2.6s) cubic-bezier(.35,.1,.6,1) forwards}
+@keyframes fall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(112vh) rotate(var(--cr,540deg));opacity:0}}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:80;opacity:0;pointer-events:none;background:linear-gradient(135deg,var(--roast),var(--espresso));color:#FFF6EC;font-size:13.5px;font-weight:700;padding:12px 20px;border-radius:999px;border:1px solid rgba(var(--glow),.55);box-shadow:0 18px 36px -18px rgba(0,0,0,.9);transition:opacity .25s,transform .25s var(--ease);max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s var(--ease) var(--d,0s),transform .65s var(--ease) var(--d,0s)}
+.reveal.in{opacity:1;transform:none}
+.staged{opacity:0;animation:rise .8s var(--ease) forwards;animation-delay:var(--d,0s)}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@media (max-width:1020px){
+  .shell{grid-template-columns:1fr}
+  .roastery{position:relative;top:0;height:auto;min-height:340px;padding:34px 22px 62px}
+  .cup-stage{width:min(220px,52%);margin:0 0 16px}
+  .enroll{padding:30px 18px 54px}
+}
+@media (max-width:560px){
+  .brand span{display:none}
+  .top-nav a{padding:9px 12px;font-size:13px}
+  .roastery h2{font-size:27px}
+  .card-name{font-size:21px}
+  .card-barcode{width:64px}
+  .submit-row{flex-direction:column;align-items:stretch}
+  .progress{justify-content:center}
+  .progress small{max-width:none}
+  .submit-row .btn{width:100%}
+  .success-facts{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  html{scroll-behavior:auto}
+  .reveal,.staged{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="bean" viewBox="0 0 40 56"><ellipse cx="20" cy="28" rx="16" ry="24" fill="currentColor"/><path d="M20 5C9 18 31 38 20 51" fill="none" stroke="rgba(0,0,0,.34)" stroke-width="4" stroke-linecap="round"/></symbol>
+  <symbol id="cup" viewBox="0 0 154 120">
+    <ellipse cx="70" cy="105" rx="54" ry="9" fill="var(--saucer,rgba(0,0,0,.3))"/>
+    <path d="M122 58h10a15 15 0 0 1 0 30h-9" fill="none" stroke="var(--cupc,#E8933A)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M18 52h104v12a52 42 0 0 1-104 0z" fill="var(--cupc,#E8933A)"/>
+    <ellipse cx="70" cy="52" rx="52" ry="8" fill="#2A170C"/><ellipse cx="70" cy="52" rx="40" ry="5.5" fill="#B0713F" opacity=".9"/><ellipse cx="62" cy="51" rx="14" ry="2.6" fill="#F0C987" opacity=".55"/>
+    <path class="st st1" d="M48 40C43 32 53 26 48 14" fill="none" stroke="var(--steam,rgba(255,240,220,.8))" stroke-width="4" stroke-linecap="round"/>
+    <path class="st st2" d="M70 42C65 32 75 26 70 10" fill="none" stroke="var(--steam,rgba(255,240,220,.8))" stroke-width="4" stroke-linecap="round"/>
+    <path class="st st3" d="M92 40C87 32 97 26 92 14" fill="none" stroke="var(--steam,rgba(255,240,220,.8))" stroke-width="4" stroke-linecap="round"/>
+  </symbol>
+</defs></svg>
+<style>.st{animation:steam 2.9s ease-in-out infinite}.st2{animation-delay:.9s}.st3{animation-delay:1.75s}@keyframes steam{0%{opacity:0;transform:translateY(5px)}35%{opacity:.95}100%{opacity:0;transform:translateY(-8px)}}</style>
+
+<div class="aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar" id="topbar">
+  <a class="brand" href="/"><svg viewBox="0 0 154 120" style="--cupc:#E8933A;--steam:rgba(240,201,135,.9);--saucer:rgba(0,0,0,.25)"><use href="#cup"/></svg><span>Coffee<em>House</em></span></a>
+  <nav class="top-nav" aria-label="Основная навигация">
+    <a href="/">Витрина</a>
+    <a href="/login" class="current" aria-current="page">Вход</a>
+    <a href="/register" class="cta">Регистрация</a>
+    <span class="who" id="who" hidden><i id="whoInitial">A</i><span id="whoName"></span></span>
+  </nav>
+</header>
+
+<main class="shell">
+  <section class="roastery" aria-label="О входе в клуб">
+    <div class="beans" id="beans" aria-hidden="true">
+      <svg viewBox="0 0 40 56" style="--x:8%;--y:14%;--r:-22deg;--s:1.15"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:74%;--y:10%;--r:26deg;--s:.8;--d:1.1s;--c:rgba(240,201,135,.42)"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:88%;--y:44%;--r:-14deg;--s:1.25;--d:.5s;--c:rgba(201,58,46,.45)"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:16%;--y:70%;--r:34deg;--s:.9;--d:1.7s;--c:rgba(111,154,78,.42)"><use href="#bean"/></svg>
+      <svg viewBox="0 0 40 56" style="--x:62%;--y:78%;--r:-30deg;--s:1.05;--d:2.3s"><use href="#bean"/></svg>
+    </div>
+    <div class="roast-inner">
+      <p class="roast-eyebrow staged" style="--d:.05s">с возвращением · fresh shot</p>
+      <h2 class="staged" style="--d:.12s">Ваш столик <em>ещё тёплый</em></h2>
+      <p class="roast-copy staged" style="--d:.2s">Войдите — и витрина снова ваша: классика на эспрессо, молочные напитки и авторские рафы. Сессия живёт пять минут бездействия: как идеальный эспрессо, она хороша, пока горячая.</p>
+      <div class="cup-stage staged" style="--d:.28s">
+        <svg viewBox="0 0 154 120" style="--cupc:#E8933A;--steam:rgba(255,240,220,.85)"><use href="#cup"/></svg>
+        <span class="cup-note">мы вас ждали ☕</span>
+      </div>
+      <dl class="roast-stats staged" style="--d:.36s">
+        <div><dt>5:00</dt><dd>таймер сессии</dd></div>
+        <div><dt>2</dt><dd>роли доступа</dd></div>
+        <div><dt>6</dt><dd>сортов зерна</dd></div>
+      </dl>
+      <p class="roast-quote staged" style="--d:.44s">«кофе остывает — сессия тоже»</p>
+    </div>
+    <div class="marquee" aria-hidden="true"><div>
+      <span>ЭСПРЕССО<i>✦</i></span><span>АМЕРИКАНО<i>✦</i></span><span>КАПУЧИНО<i>✦</i></span><span>ЛАТТЕ<i>✦</i></span><span>РАФ<i>✦</i></span><span>ФЛЭТ УАЙТ<i>✦</i></span><span>КОЛД БРЮ<i>✦</i></span><span>МОККА<i>✦</i></span>
+      <span>ЭСПРЕССО<i>✦</i></span><span>АМЕРИКАНО<i>✦</i></span><span>КАПУЧИНО<i>✦</i></span><span>ЛАТТЕ<i>✦</i></span><span>РАФ<i>✦</i></span><span>ФЛЭТ УАЙТ<i>✦</i></span><span>КОЛД БРЮ<i>✦</i></span><span>МОККА<i>✦</i></span>
+    </div></div>
+  </section>
+
+  <section class="enroll" id="enroll">
+    <div class="enroll-inner">
+      <p class="head-eyebrow reveal">вход в клуб</p>
+      <h1 class="reveal" style="--d:.06s">С возвращением за стойку</h1>
+      <p class="lead reveal" style="--d:.12s">Введите позывной и пароль — карта узнает вас по номеру. Роль и права подтянутся из users.csv, а каждое действие попадёт в logs.</p>
+      <p class="demo-pill reveal" id="demoPill" style="--d:.16s" hidden>◆ Демо-режим: admin / admin123 или позывной из реестра регистрации (пароль 4+ символа)</p>
+
+      <div class="card-stage reveal" style="--d:.2s" id="cardStage">
+        <div class="card-float">
+          <article class="club-card" id="clubCard" aria-label="Карта клуба: живой предпросмотр">
+            <div class="card-sheen" id="cardSheen" aria-hidden="true"></div>
+            <div class="card-noise" aria-hidden="true"></div>
+            <header class="card-top">
+              <span class="card-brand"><svg viewBox="0 0 154 120" style="--cupc:#F0C987;--steam:rgba(255,246,236,.85);--saucer:rgba(0,0,0,.25)"><use href="#cup"/></svg>Coffee House</span>
+              <span class="card-tier" id="cardTier">ГОСТЬ</span>
+            </header>
+            <div class="card-mid">
+              <span class="card-avatar" id="cardAvatar">?</span>
+              <div><span class="card-label">владелец карты</span><strong class="card-name" id="cardName">ваш позывной</strong></div>
+            </div>
+            <div class="card-number" id="cardNumber">0000 0000 0000 0000</div>
+            <footer class="card-bottom">
+              <span>с <b id="cardSince">2026</b></span>
+              <span class="card-status"><i id="cardDot"></i><span id="cardStatus">ждём позывной</span></span>
+              <span class="card-barcode" aria-hidden="true"></span>
+            </footer>
+          </article>
+        </div>
+        <p class="card-hint">Номер карты совпадает с тем, что выдавался при регистрации — клуб узнаёт своих.</p>
+      </div>
+
+      <div class="alert" id="serverAlert" role="alert" hidden><b>!</b><span id="serverAlertText"></span></div>
+      <noscript><div class="alert" style="animation:none"><b>!</b><span>Живой предпросмотр требует JavaScript. Форма входа работает и без него.</span></div></noscript>
+
+      <form class="enroll-form reveal" style="--d:.26s" id="loginForm" method="post" action="/login">
+        <div class="field" id="fLogin">
+          <label for="login">Позывной <span class="counter" id="loginCounter">0 / 20</span></label>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="login" name="login" type="text" required maxlength="20" autocomplete="username" spellcheck="false" autocapitalize="none" placeholder="например, admin или raf_lover" aria-describedby="loginMsg">
+            <span class="status idle" id="loginStatus" aria-live="polite"></span>
+          </div>
+          <p class="msg" id="loginMsg">Тот же позывной, что на вашей карте клуба.</p>
+        </div>
+
+        <div class="field" id="fPass">
+          <label for="password">Пароль <span class="counter" id="passCounter">0 симв.</span></label>
+          <div class="input-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="ваш секретный рецепт" aria-describedby="passMsg capsMsg">
+            <button type="button" class="eye" data-eye="password" aria-label="Показать пароль" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.7" fill="currentColor"/><line class="slash" x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <p class="msg" id="passMsg">Пароль хранится в users.csv как необратимый PBKDF2-хеш.</p>
+          <p class="msg caps" id="capsMsg" hidden>⇪ Caps Lock включён — пароль может уйти не тем.</p>
+        </div>
+
+        <div class="quick-row">
+          <button type="button" class="btn btn-ghost btn-sm" id="demoFill" hidden>☕ Демо-доступ</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="resetBtn">↺ Очистить</button>
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" id="remember">
+          <span class="box" aria-hidden="true"></span>
+          <span>Запомнить позывной на этом устройстве (пароль не сохраняется).</span>
+        </label>
+
+        <div class="submit-row">
+          <div class="progress">
+            <span class="ring">
+              <svg viewBox="0 0 52 52" aria-hidden="true"><circle class="track" cx="26" cy="26" r="22"/><circle class="bar" id="ringBar" cx="26" cy="26" r="22" stroke-dasharray="138.23" stroke-dashoffset="138.23"/></svg>
+              <span class="pct" id="ringPct">0%</span>
+            </span>
+            <small id="readyLabel">готовность к входу</small>
+          </div>
+          <button class="btn btn-primary btn-lg" type="submit" id="submitBtn"><span class="btn-label">Войти в клуб</span><span class="spinner" aria-hidden="true"></span></button>
+        </div>
+      </form>
+
+      <section class="success" id="success" hidden aria-live="polite">
+        <div id="sessionLive">
+          <span class="stamp">доступ открыт</span>
+          <h2>С возвращением, <span id="successName">друг</span>!</h2>
+          <p id="successRole">Роль «читатель»: витрина и профиль открыты.</p>
+          <div class="session-ring" id="sessionRing">
+            <svg viewBox="0 0 132 132" aria-hidden="true"><circle class="track" cx="66" cy="66" r="56"/><circle class="bar" id="sessionBar" cx="66" cy="66" r="56" stroke-dasharray="351.86" stroke-dashoffset="0"/></svg>
+            <span class="time" id="sessionTime">5:00</span>
+            <span class="cap">сессия</span>
+          </div>
+          <dl class="success-facts">
+            <div><dt>Позывной</dt><dd id="factLogin">—</dd></div>
+            <div><dt>Номер карты</dt><dd id="factNumber">—</dd></div>
+            <div><dt>Роль</dt><dd id="factRole">Читатель</dd></div>
+            <div><dt>Сессия</dt><dd>5 минут</dd></div>
+          </dl>
+          <div class="success-actions">
+            <button type="button" class="btn btn-primary" id="extendBtn">⟳ Продлить сессию</button>
+            <button type="button" class="btn btn-outline" id="downloadBtn">↓ Скачать карту</button>
+            <button type="button" class="btn btn-ghost" id="switchBtn">Сменить аккаунт</button>
+          </div>
+        </div>
+        <div id="sessionDead" hidden>
+          <span class="stamp cold">сессия остыла</span>
+          <h2>Кофе остыл — пора войти снова</h2>
+          <p>Пять минут бездействия прошли. Так же ведёт себя и настоящая сессия на сервере: таймер сбрасывается только активностью.</p>
+          <div class="success-actions"><button type="button" class="btn btn-primary" id="reloginBtn">Войти снова</button></div>
+        </div>
+      </section>
+
+      <p class="foot-links">Нет карты клуба? <a href="/register">Зарегистрироваться</a> · <a href="/">Посмотреть витрину</a></p>
+      <p class="legal">Учебный проект на FastAPI. Аккаунты — <b>users.csv</b>, пароль — PBKDF2-хеш, действия — в <b>logs</b>. Сессия живёт 5 минут без активности.</p>
+    </div>
+  </section>
+</main>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="application/json" id="server-state">{"mode":"server","error":{{ error|default(None)|tojson }},"user":{{ user|default(None)|tojson }},"values":{{ values|default({})|tojson }}}</script>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let server = null;
+try { server = JSON.parse($('#server-state').textContent); } catch (e) { server = null; }
+const SERVER = !!(server && server.mode === 'server');
+const DEMO = !SERVER;
+$('#demoPill').hidden = !DEMO;
+$('#demoFill').hidden = !DEMO;
+
+if (SERVER && server.user && server.user.login) {
+  $('#who').hidden = false;
+  $('#whoName').textContent = server.user.login;
+  $('#whoInitial').textContent = server.user.login[0].toUpperCase();
+}
+const showAlert = text => {
+  const box = $('#serverAlert');
+  $('#serverAlertText').textContent = text;
+  box.hidden = false;
+  box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';
+};
+if (SERVER && server.error) { showAlert(server.error); $('#password').focus(); }
+if (SERVER && server.values && server.values.login) $('#login').value = String(server.values.login);
+
+const KEY = 'coffee-club-members';
+const readMembers = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } };
+
+const form = $('#loginForm'), loginEl = $('#login'), passEl = $('#password'), rememberEl = $('#remember'), submitBtn = $('#submitBtn');
+const state = { login:false, pass:false };
+form.noValidate = true;
+$('#cardSince').textContent = new Date().getFullYear();
+
+try {
+  const last = localStorage.getItem('coffee-last-login');
+  if (last && !loginEl.value) { loginEl.value = last; rememberEl.checked = true; }
+} catch (e) {}
+
+let toastTimer = null;
+const toast = text => {
+  const el = $('#toast'); el.textContent = text; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+};
+
+const fnv = s => { let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const numberOf = login => {
+  let h = fnv((login || 'coffee').toLowerCase()); const g = [];
+  for (let i = 0; i < 4; i++) { h = (Math.imul(h, 1664525) + 1013904223) >>> 0; g.push(String(h % 10000).padStart(4, '0')); }
+  return g.join(' ');
+};
+
+const memberFor = login => readMembers().find(m => m.login.toLowerCase() === login.toLowerCase());
+const paintCard = () => {
+  const v = loginEl.value.trim();
+  $('#cardName').textContent = v || 'ваш позывной';
+  $('#cardAvatar').textContent = v ? v[0].toUpperCase() : '?';
+  $('#cardNumber').textContent = numberOf(v);
+  let tier = 'ГОСТЬ';
+  if (v.toLowerCase() === 'admin') tier = 'АДМИН';
+  else if (DEMO && memberFor(v)) tier = 'ЧИТАТЕЛЬ';
+  $('#cardTier').textContent = tier;
+  const ready = !!v && !!passEl.value;
+  $('#cardStatus').textContent = !v ? 'ждём позывной' : !passEl.value ? 'ждём пароль' : 'готов к входу';
+  $('#cardDot').style.background = ready ? 'var(--accent)' : '#B9A48C';
+};
+
+const card = $('#clubCard'), stage = $('#cardStage'), sheen = $('#cardSheen');
+if (!reduce && window.matchMedia('(hover:hover)').matches) {
+  let tx = 0, ty = 0, cx = 0, cy = 0, raf = null, hovering = false;
+  const loop = () => {
+    cx += (tx - cx) * .14; cy += (ty - cy) * .14;
+    card.style.transform = `rotateX(${cy.toFixed(2)}deg) rotateY(${cx.toFixed(2)}deg)`;
+    if (hovering || Math.abs(tx - cx) > .02 || Math.abs(ty - cy) > .02) raf = requestAnimationFrame(loop);
+    else { raf = null; card.style.transform = ''; }
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+  stage.addEventListener('pointermove', e => {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+    tx = (px - .5) * 16; ty = (.5 - py) * 12; hovering = true;
+    sheen.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+    sheen.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+    kick();
+  });
+  stage.addEventListener('pointerleave', () => { hovering = false; tx = 0; ty = 0; kick(); });
+}
+
+const C = 2 * Math.PI * 22;
+const paintProgress = () => {
+  const done = [state.login, state.pass].filter(Boolean).length, p = done / 2;
+  $('#ringBar').style.strokeDashoffset = String(C * (1 - p));
+  $('#ringPct').textContent = Math.round(p * 100) + '%';
+  $('#readyLabel').textContent = p === 1 ? 'можно входить' : 'готовность к входу';
+  submitBtn.classList.toggle('ready', p === 1);
+};
+
+const checkLogin = () => {
+  const v = loginEl.value.trim();
+  $('#loginCounter').textContent = `${v.length} / 20`;
+  state.login = !!v;
+  const chip = $('#loginStatus');
+  if (!v) { chip.className = 'status idle'; chip.textContent = ''; $('#fLogin').dataset.state = ''; $('#loginMsg').textContent = 'Тот же позывной, что на вашей карте клуба.'; }
+  else {
+    chip.className = 'status ok'; chip.textContent = 'принято';
+    $('#fLogin').dataset.state = 'ok';
+    $('#loginMsg').textContent = DEMO && memberFor(v) ? 'Позывной найден в локальном реестре клуба.' : v.toLowerCase() === 'admin' ? 'Бариста-админ, узнаём вас.' : 'Позывной принят — проверим при входе.';
+  }
+  paintCard(); paintProgress();
+};
+const checkPass = () => {
+  state.pass = !!passEl.value;
+  $('#passCounter').textContent = `${passEl.value.length} симв.`;
+  $('#fPass').dataset.state = state.pass ? 'ok' : '';
+  paintCard(); paintProgress();
+};
+loginEl.addEventListener('input', checkLogin);
+loginEl.addEventListener('blur', () => { loginEl.value = loginEl.value.trim(); checkLogin(); });
+passEl.addEventListener('input', checkPass);
+
+const caps = $('#capsMsg');
+const capsCheck = e => { if (e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); };
+passEl.addEventListener('keydown', capsCheck);
+passEl.addEventListener('keyup', capsCheck);
+passEl.addEventListener('blur', () => { caps.hidden = true; });
+
+$$('[data-eye]').forEach(btn => btn.addEventListener('click', () => {
+  const input = document.getElementById(btn.dataset.eye);
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.classList.toggle('on', show);
+  btn.setAttribute('aria-pressed', String(show));
+  btn.setAttribute('aria-label', show ? 'Скрыть пароль' : 'Показать пароль');
+  input.focus({ preventScroll:true });
+}));
+
+$('#demoFill').addEventListener('click', () => {
+  loginEl.value = 'admin'; passEl.value = 'admin123';
+  checkLogin(); checkPass(); submitBtn.focus();
+  toast('Демо-доступ подставлен: admin / admin123');
+});
+$('#resetBtn').addEventListener('click', () => {
+  form.reset(); $('#serverAlert').hidden = true; caps.hidden = true;
+  checkLogin(); checkPass(); submitBtn.classList.remove('loading');
+  loginEl.focus(); toast('Форма очищена');
+});
+
+const burst = () => {
+  if (reduce) return;
+  const box = $('#confetti'), colors = ['#E8933A','#F5B544','#C93A2E','#6F9A4E','#8F5A30','#F0C987'];
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 40 56');
+    const u = document.createElementNS('http://www.w3.org/2000/svg','use'); u.setAttribute('href','#bean'); s.appendChild(u);
+    s.style.setProperty('--cx',(5 + Math.random()*90)+'vw');
+    s.style.setProperty('--cw',(12 + Math.random()*16)+'px');
+    s.style.setProperty('--cc',colors[i % colors.length]);
+    s.style.setProperty('--cd',(2.1 + Math.random()*1.6)+'s');
+    s.style.setProperty('--cr',(360 + Math.random()*720)+'deg');
+    s.style.animationDelay = (Math.random()*.35)+'s';
+    s.addEventListener('animationend', () => s.remove());
+    box.appendChild(s); setTimeout(() => s.remove(), 5000);
+  }
+};
+
+const LIMIT = 5*60*1000, SC = 2*Math.PI*56;
+let sessionTimer = null, lastActivity = 0, sessionActive = false;
+const bump = () => { if (sessionActive) lastActivity = Date.now(); };
+['pointerdown','keydown','wheel','touchstart'].forEach(ev => window.addEventListener(ev, bump, { passive:true }));
+let lastScrollBump = 0;
+window.addEventListener('scroll', () => { const n = Date.now(); if (n - lastScrollBump > 1000) { lastScrollBump = n; bump(); } }, { passive:true });
+
+const stopSession = () => { sessionActive = false; if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; } };
+const expireSession = () => {
+  stopSession();
+  $('#sessionLive').hidden = true; $('#sessionDead').hidden = false;
+  toast('Сессия истекла — войдите снова');
+};
+const startSession = () => {
+  stopSession();
+  sessionActive = true; lastActivity = Date.now();
+  $('#sessionLive').hidden = false; $('#sessionDead').hidden = true;
+  const ring = $('#sessionRing'), bar = $('#sessionBar'), time = $('#sessionTime');
+  const tick = () => {
+    const left = LIMIT - (Date.now() - lastActivity);
+    if (left <= 0) { time.textContent = '0:00'; bar.style.strokeDashoffset = String(SC); expireSession(); return; }
+    const s = Math.ceil(left/1000);
+    time.textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+    bar.style.strokeDashoffset = String(SC * (1 - left/LIMIT));
+    ring.classList.toggle('warn', s <= 60 && s > 15);
+    ring.classList.toggle('danger', s <= 15);
+  };
+  tick(); sessionTimer = setInterval(tick, 500);
+};
+$('#extendBtn').addEventListener('click', () => { bump(); toast('Сессия продлена до 5:00'); });
+const backToForm = () => {
+  stopSession();
+  $('#success').hidden = true; form.hidden = false;
+  passEl.value = ''; checkPass();
+  $('#serverAlert').hidden = true;
+  form.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'start' });
+  passEl.focus();
+};
+$('#switchBtn').addEventListener('click', () => { backToForm(); toast('Введите другой аккаунт'); });
+$('#reloginBtn').addEventListener('click', backToForm);
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+$('#downloadBtn').addEventListener('click', () => {
+  const a = '#E8933A', b = '#F5B544';
+  const name = loginEl.value.trim() || 'guest', num = numberOf(name), tier = $('#cardTier').textContent;
+  let bars = '', x = 470;
+  for (let i = 0; i < 26; i++) { const w = 1 + (i % 3); bars += `<rect x="${x}" y="300" width="${w}" height="42" fill="#FFF6EC" opacity=".9"/>`; x += w + 2 + (i % 2); }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".58" stop-color="#1E0F07"/><stop offset="1" stop-color="${b}"/></linearGradient><linearGradient id="s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#120904" stop-opacity=".42"/><stop offset="1" stop-color="#120904" stop-opacity=".64"/></linearGradient></defs><rect width="640" height="400" rx="28" fill="url(#g)"/><rect width="640" height="400" rx="28" fill="url(#s)"/><rect x="1" y="1" width="638" height="398" rx="27" fill="none" stroke="${a}" stroke-opacity=".7" stroke-width="2"/><text x="40" y="62" fill="#FFF6EC" font-family="Georgia,serif" font-size="26">Coffee House</text><rect x="470" y="38" width="130" height="34" rx="17" fill="#FFF6EC" fill-opacity=".16" stroke="#FFF6EC" stroke-opacity=".4"/><text x="535" y="61" fill="#FFF6EC" font-family="Helvetica,Arial,sans-serif" font-size="13" letter-spacing="3" text-anchor="middle">${esc(tier)}</text><circle cx="80" cy="168" r="38" fill="${a}"/><text x="80" y="182" fill="#1E0F07" font-family="Georgia,serif" font-size="34" font-weight="bold" text-anchor="middle">${esc(name[0].toUpperCase())}</text><text x="140" y="152" fill="#FFF6EC" fill-opacity=".72" font-family="Helvetica,Arial,sans-serif" font-size="12" letter-spacing="3">ВЛАДЕЛЕЦ КАРТЫ</text><text x="140" y="190" fill="#FFF6EC" font-family="Georgia,serif" font-size="34" font-weight="bold">${esc(name)}</text><text x="40" y="258" fill="#FFF6EC" font-family="monospace" font-size="26" letter-spacing="4">${esc(num)}</text><line x1="40" y1="284" x2="600" y2="284" stroke="#FFF6EC" stroke-opacity=".25"/><text x="40" y="330" fill="#FFF6EC" fill-opacity=".85" font-family="Helvetica,Arial,sans-serif" font-size="15">в клубе с ${new Date().getFullYear()}</text><text x="40" y="356" fill="#FFF6EC" fill-opacity=".6" font-family="Helvetica,Arial,sans-serif" font-size="12">сессия 5 минут · кофе всегда свежий</text>${bars}</svg>`;
+  const url = URL.createObjectURL(new Blob([svg], { type:'image/svg+xml;charset=utf-8' }));
+  const link = document.createElement('a'); link.href = url; link.download = `coffee-card-${name}.svg`;
+  document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  toast('Карта сохранена как SVG');
+});
+
+let attempts = 0;
+const failField = (field, msg, text, input) => {
+  field.dataset.state = 'bad';
+  if (msg) msg.textContent = text;
+  input.focus();
+  field.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'center' });
+};
+form.addEventListener('submit', e => {
+  const v = loginEl.value.trim();
+  if (!v) { e.preventDefault(); failField($('#fLogin'), $('#loginMsg'), 'Введите позывной — без него клуб не узнает вас.', loginEl); return; }
+  if (!passEl.value) { e.preventDefault(); failField($('#fPass'), $('#passMsg'), 'Введите пароль от карты.', passEl); return; }
+  try { rememberEl.checked ? localStorage.setItem('coffee-last-login', v) : localStorage.removeItem('coffee-last-login'); } catch (err) {}
+  submitBtn.classList.add('loading');
+  if (!DEMO) return;
+  e.preventDefault();
+  setTimeout(() => {
+    submitBtn.classList.remove('loading');
+    const isAdmin = v.toLowerCase() === 'admin' && passEl.value === 'admin123';
+    const member = memberFor(v);
+    const ok = isAdmin || (member && passEl.value.length >= 4);
+    if (!ok) {
+      attempts++;
+      showAlert(attempts >= 2 ? 'Неверный логин или пароль. Подсказка: admin / admin123, либо сначала зарегистрируйте позывной.' : 'Неверный логин или пароль. Попробуйте ещё раз.');
+      $('#fPass').dataset.state = 'bad';
+      passEl.value = ''; checkPass(); passEl.focus();
+      return;
+    }
+    const role = isAdmin ? 'admin' : 'reader';
+    $('#successName').textContent = v;
+    $('#successRole').textContent = role === 'admin' ? 'Роль «админ»: можно всё — добавлять, менять и удалять напитки на витрине.' : 'Роль «читатель»: витрина и личный профиль открыты, изменения — только для админов.';
+    $('#factLogin').textContent = v;
+    $('#factNumber').textContent = numberOf(v);
+    $('#factRole').textContent = role === 'admin' ? 'Администратор' : 'Читатель';
+    form.hidden = true; $('#success').hidden = false;
+    startSession(); burst();
+    $('#success').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block:'center' });
+    toast('Доступ открыт — сессия 5:00 пошла');
+  }, 550);
+});
+
+const topbar = $('#topbar');
+const onScroll = () => topbar.classList.toggle('scrolled', window.scrollY > 6);
+window.addEventListener('scroll', onScroll, { passive:true }); onScroll();
+
+const beans = $('#beans');
+if (beans && !reduce && window.matchMedia('(hover:hover)').matches) {
+  let pending = false;
+  $('.roastery').addEventListener('pointermove', e => {
+    if (pending) return; pending = true;
+    requestAnimationFrame(() => {
+      const r = e.currentTarget.getBoundingClientRect();
+      const dx = (e.clientX - r.left)/r.width - .5, dy = (e.clientY - r.top)/r.height - .5;
+      beans.style.transform = `translate(${(-dx*26).toFixed(1)}px, ${(-dy*20).toFixed(1)}px)`;
+      pending = false;
+    });
+  });
+}
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { threshold:.1, rootMargin:'0px 0px -40px 0px' }) : null;
+$$('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+
+checkLogin(); checkPass(); paintCard(); paintProgress();
+})();
+</script>
+</body>
+</html>
