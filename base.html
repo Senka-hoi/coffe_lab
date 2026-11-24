@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Coffee House — очень вкусная витрина разновидностей и вариаций кофе">
+  <title>{% block title %}Coffee House{% endblock %} · Coffee House</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E☕%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600;1,900&family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body data-auth="{{ 1 if user else 0 }}">
+{% set user = user|default(None) %}
+{% set path = request.url.path %}
+
+<!-- SVG-символы: чашка и зерно -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="bean" viewBox="0 0 40 56">
+      <ellipse cx="20" cy="28" rx="16" ry="24" fill="currentColor"/>
+      <path d="M20 5 C 9 18, 31 38, 20 51" fill="none" stroke="rgba(0,0,0,.32)" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="cup" viewBox="0 0 154 120">
+      <ellipse cx="70" cy="105" rx="54" ry="9" fill="var(--saucer, rgba(36,18,9,.16))"/>
+      <path d="M122 58 h10 a15 15 0 0 1 0 30 h-9" fill="none" stroke="var(--cup,#e8933a)" stroke-width="7" stroke-linecap="round"/>
+      <path d="M18 52 h104 v12 a52 42 0 0 1 -104 0 z" fill="var(--cup,#e8933a)"/>
+      <ellipse cx="70" cy="52" rx="52" ry="8" fill="var(--coffee,#3b2416)"/>
+      <ellipse cx="70" cy="52" rx="40" ry="5.5" fill="var(--crema,#b0713f)" opacity=".85"/>
+      <ellipse cx="62" cy="51" rx="14" ry="2.6" fill="#f0c987" opacity=".5"/>
+      <path class="steam s1" d="M48 40 C 43 32, 53 26, 48 14" fill="none" stroke="var(--steam, rgba(255,244,230,.75))" stroke-width="4" stroke-linecap="round"/>
+      <path class="steam s2" d="M70 42 C 65 32, 75 26, 70 10" fill="none" stroke="var(--steam, rgba(255,244,230,.75))" stroke-width="4" stroke-linecap="round"/>
+      <path class="steam s3" d="M92 40 C 87 32, 97 26, 92 14" fill="none" stroke="var(--steam, rgba(255,244,230,.75))" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="bg-aurora" aria-hidden="true"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar" id="topbar">
+  <a class="brand" href="/">
+    <svg class="brand-cup" viewBox="0 0 154 120" style="--cup:#e8933a;--steam:rgba(240,201,135,.9)"><use href="#cup"/></svg>
+    <span class="brand-name">Coffee<em>House</em></span>
+  </a>
+
+  <nav class="nav" id="nav" aria-label="Основная навигация">
+    {% if user %}
+      <a href="/" class="nav-link {{ 'active' if path == '/' else '' }}">Витрина</a>
+      <a href="/profile" class="nav-link {{ 'active' if path.startswith('/profile') else '' }}">Профиль</a>
+      {% if user.role == 'admin' %}
+        <a href="/edit" class="nav-link {{ 'active' if path.startswith('/edit') else '' }}">Управление</a>
+      {% endif %}
+    {% else %}
+      <a href="/login" class="nav-link {{ 'active' if path == '/login' else '' }}">Вход</a>
+      <a href="/register" class="nav-link {{ 'active' if path == '/register' else '' }}">Регистрация</a>
+    {% endif %}
+  </nav>
+
+  <div class="top-right">
+    {% if user %}
+      <div class="session-pill" id="sessionPill" title="Сессия истекает через 5 минут бездействия">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 2h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span id="sessionTime">5:00</span>
+      </div>
+      <a class="user-chip" href="/profile" title="Открыть профиль">
+        <span class="mini-avatar">{{ user.login[0]|upper }}</span>
+        <span class="user-name">{{ user.login }}</span>
+        <span class="role-dot {{ user.role }}" title="{{ 'Администратор' if user.role == 'admin' else 'Читатель' }}"></span>
+      </a>
+      <a class="btn btn-ghost btn-sm" href="/logout">Выйти</a>
+    {% else %}
+      <a class="btn btn-ghost btn-sm" href="/login">Войти</a>
+      <a class="btn btn-primary btn-sm" href="/register">Регистрация</a>
+    {% endif %}
+    <button class="burger" id="burger" aria-label="Меню" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>{% block content %}{% endblock %}</main>
+
+<footer class="footer">
+  <div>☕ Coffee House — учебная витрина кофе на FastAPI</div>
+  <div class="footer-note">сессия 5 минут · users.csv + data.csv · все действия пишутся в logs</div>
+</footer>
+
+<!-- Подтверждение удаления -->
+<div class="modal" id="confirmModal" hidden>
+  <div class="scrim" data-close></div>
+  <div class="dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h3 id="confirmTitle">Подтвердите действие</h3>
+    <p id="confirmText" class="muted"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" type="button" data-close>Отмена</button>
+      <button class="btn btn-danger" type="button" id="confirmYes">Удалить</button>
+    </div>
+  </div>
+</div>
+
+{% if user %}
+<!-- Сессия истекла -->
+<div class="modal" id="sessionModal" hidden>
+  <div class="scrim"></div>
+  <div class="dialog session-dialog" role="alertdialog" aria-modal="true" aria-labelledby="sessionTitle">
+    <svg class="session-cup" viewBox="0 0 154 120" style="--cup:#d8c6b0;--coffee:#b9a48c;--crema:#cbb79e;--steam:rgba(138,115,96,.45)"><use href="#cup"/></svg>
+    <h3 id="sessionTitle">Сессия остыла</h3>
+    <p class="muted">Прошло 5 минут бездействия. Войдите снова — кофе уже ждёт.</p>
+    <a class="btn btn-primary btn-block" href="/login">Войти заново</a>
+  </div>
+</div>
+{% endif %}
+
+<script src="/static/app.js" defer></script>
+</body>
+</html>

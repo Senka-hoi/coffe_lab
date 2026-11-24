@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<section class="auth">
+  <aside class="auth-brand">
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:12%;--y:66%;--r:24deg;--s:1" aria-hidden="true"><use href="#bean"/></svg>
+    <svg class="float-bean" viewBox="0 0 40 56" style="--x:80%;--y:14%;--r:-32deg;--s:1.2;--fd:.9s;--bc:rgba(201,58,46,.4)" aria-hidden="true"><use href="#bean"/></svg>
+    <div class="auth-brand-inner">
+      <svg class="auth-cup" viewBox="0 0 154 120" style="--cup:#f0c987;--coffee:#241209;--steam:rgba(255,240,220,.85);--saucer:rgba(0,0,0,.35)"><use href="#cup"/></svg>
+      <h2>Присоединяйтесь.</h2>
+      <p>Создайте аккаунт читателя: вся витрина и личный профиль — в вашем распоряжении.</p>
+      <p class="hand-note light">«первый капучино за наш счёт»</p>
+    </div>
+  </aside>
+
+  <div class="auth-panel">
+    <div class="form-card reveal">
+      <p class="eyebrow">регистрация</p>
+      <h1>Создать аккаунт</h1>
+      {% if error %}<div class="alert error" role="alert"><b>!</b><span>{{ error }}</span></div>{% endif %}
+      <form method="post" action="/register" id="registerForm" data-loading>
+        <label class="field">
+          <span>Логин</span>
+          <input name="login" required autocomplete="username" placeholder="3–20 символов: латиница, цифры, _" maxlength="20">
+        </label>
+        <label class="field">
+          <span>Пароль</span>
+          <span class="pass-wrap">
+            <input type="password" name="password" id="regPass" required autocomplete="new-password" placeholder="минимум 4 символа">
+            <button type="button" class="eye" data-eye aria-label="Показать пароль" aria-pressed="false">
+              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><line class="slash" x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+          </span>
+          <span class="strength" id="strength"><i></i><i></i><i></i><i></i></span>
+          <span class="strength-label" id="strengthLabel">минимум 4 символа</span>
+        </label>
+        <label class="field">
+          <span>Повторите пароль</span>
+          <span class="pass-wrap">
+            <input type="password" name="password2" id="regPass2" required autocomplete="new-password" placeholder="ещё раз">
+            <button type="button" class="eye" data-eye aria-label="Показать пароль" aria-pressed="false">
+              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><line class="slash" x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+          </span>
+          <span class="match-hint" id="matchHint"></span>
+        </label>
+        <button class="btn btn-primary btn-lg btn-block" type="submit"><span class="btn-label">Создать аккаунт</span><span class="spinner"></span></button>
+      </form>
+      <p class="hint center">Новые аккаунты получают роль «читатель» — просмотр без изменений.</p>
+      <p class="muted center">Уже есть аккаунт? <a href="/login">Войти</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}
